@@ -1,0 +1,205 @@
+import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
+
+plugins {
+    id "java"
+    id "edu.wpi.first.GradleRIO" version "2022.4.1"
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+def ROBOT_MAIN_CLASS = "frc.robot.Main"
+
+// Define my targets (RoboRIO) and artifacts (deployable files)
+// This is added by GradleRIO's backing project DeployUtils.
+deploy {
+    targets {
+        roborio(getTargetTypeClass('RoboRIO')) {
+            // Team number is loaded either from the .wpilib/wpilib_preferences.json
+            // or from command line. If not found an exception will be thrown.
+            // You can use getTeamOrDefault(team) instead of getTeamNumber if you
+            // want to store a team number in this file.
+            team = project.frc.getTeamNumber()
+            debug = project.frc.getDebugOrDefault(false)
+
+            artifacts {
+                // First part is artifact name, 2nd is artifact type
+                // getTargetTypeClass is a shortcut to get the class type using a string
+
+                frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+                }
+
+                // Static files artifact
+                frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+                    files = project.fileTree('src/main/deploy')
+                    directory = '/home/lvuser/deploy'
+                }
+            }
+        }
+    }
+}
+
+def deployArtifact = deploy.targets.roborio.artifacts.frcJava
+
+// Set to true to use debug for JNI.
+wpi.java.debugJni = false
+
+// Set this to true to enable desktop support.
+def includeDesktopSupport = true
+
+// Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
+// Also defines JUnit 4.
+dependencies {
+    implementation wpi.java.deps.wpilib()
+    implementation wpi.java.vendor.java()
+
+    roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
+    roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
+
+    roborioRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.roborio)
+    roborioRelease wpi.java.vendor.jniRelease(wpi.platforms.roborio)
+
+    nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
+    nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)
+    simulationDebug wpi.sim.enableDebug()
+
+    nativeRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.desktop)
+    nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
+    simulationRelease wpi.sim.enableRelease()
+
+    testImplementation 'junit:junit:4.12'
+
+    // Webserver2 requirements
+    implementation group: 'org.eclipse.jetty', name: 'jetty-http', version: '9.3.9.v20160517'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.3.9.v20160517'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.3.9.v20160517'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-util', version: '9.3.9.v20160517'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-security', version: '9.3.9.v20160517'
+    implementation group: 'org.eclipse.jetty.websocket', name: 'websocket-server', version: '9.3.9.v20160517'
+    implementation group: 'org.eclipse.jetty.websocket', name: 'websocket-servlet', version: '9.3.9.v20160517'
+    implementation group: 'org.eclipse.jetty.websocket', name: 'websocket-api', version: '9.3.9.v20160517'
+    implementation group: 'org.eclipse.jetty.websocket', name: 'websocket-common', version: '9.3.9.v20160517'
+    implementation group: 'org.eclipse.jetty', name: 'jetty-io', version: '9.3.9.v20160517'
+    implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.0-alpha1'
+    implementation group: 'org.json', name: 'json', version: '20210307'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'org.msgpack:msgpack-core:0.9.0'
+}
+
+// Simulation configuration (e.g. environment variables).
+wpi.sim.addGui().defaultEnabled = true
+wpi.sim.addDriverstation()
+
+// Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
+// in order to make them all available at runtime. Also adding the manifest so WPILib
+// knows where to look for our Robot Class.
+jar {
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+// Configure jar and deploy tasks
+deployArtifact.jarTask = jar
+wpi.java.configureExecutableTasks(jar)
+wpi.java.configureTestTasks(test)
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Build Meta-data file generation
+///////////////////////////////////////////////////////////////////////////////////////////////////
+def BUILD_INFO_FILE = "$projectDir/src/main/deploy/www/buildinfo.html"
+
+
+task genMetaData(){
+    doLast{
+
+        String filecontents = ""
+        String build_uname = ""
+        String build_host = ""
+        String build_time = ""
+        String git_sha1 = ""
+        String git_branch = ""
+        String git_wd_clean = ""
+        String git_tag_list = ""
+
+        //Get the user's name. Shouldn't throw errors, just "null" if 
+        // it can't figure out who you are.
+        build_uname = System.getProperty("user.name")
+
+        //Get the closest thing to PC name we can find in Groovy, the
+        // local machine's Hostname. This could definietly throw exceptions
+        // if you've got a weird system or something.
+        try{
+            build_host = java.net.InetAddress.getLocalHost().getHostName()
+        } catch (all) {
+            build_host = "unknown"
+        }
+
+        //Build time in totally-not-ISO format
+        build_time = new java.text.SimpleDateFormat("MM-dd-yyyy hh:mm:ssa").format(new Date())
+
+        // Get currently checked-out SHA1
+        try{
+            git_sha1 = Grgit.open(currentDir: file('.')).head().id
+        } catch (all) {
+            git_sha1 = "unknown"
+        }
+
+        // Get currently checked-out branch friendly name
+        try{
+            git_branch = Grgit.open(currentDir: file('.')).branch.current().name
+        } catch (all) {
+            git_branch = "unknown"
+        }
+
+        // Get friendly names of the tags on this commit (if any)
+        try{
+            def repo = Grgit.open(currentDir: file('.'))
+            def head = repo.head()
+            def tag_list = repo.tag.list().findAll{it.commit == head}
+            if(tag_list.size() > 0){
+                for(tag_obj in tag_list){
+                    git_tag_list += tag_obj.getName()+","
+                }
+                
+            } else {
+                git_tag_list = "none"
+            }
+
+        } catch (Exception e) {
+            System.out.println(e)
+            git_tag_list = "unknown"
+        }
+
+        // Get clean/dirty status of working directory
+        try{
+            git_wd_clean = Grgit.open(currentDir: file('.')).status().isClean()
+        } catch (all) {
+            git_wd_clean = "unknown"
+        }
+
+        // Build file contents and write to disk
+        filecontents += "<html><body>\n"
+        filecontents += "<table>\n"
+        filecontents += "<head><link rel=\"stylesheet\" href=\"main.css\"></head>\n"
+        filecontents += "<tr><td>Build Username     </td><td> ${build_uname}  </td></tr>\n"
+        filecontents += "<tr><td>Build Host PC      </td><td> ${build_host}   </td></tr>\n"
+        filecontents += "<tr><td>Build Time         </td><td> ${build_time}   </td></tr>\n"
+        filecontents += "<tr><td>Git Tags           </td><td> ${git_tag_list} </td></tr>\n"
+        filecontents += "<tr><td>Git Branch         </td><td> ${git_branch}   </td></tr>\n"
+        filecontents += "<tr><td>Git SHA1           </td><td> ${git_sha1}     </td></tr>\n"
+        filecontents += "<tr><td>Working Dir Clean? </td><td> ${git_wd_clean} </td></tr>\n"
+        filecontents += "</table>\n" 
+        filecontents += "</body></html>\n"
+
+        new File(BUILD_INFO_FILE).text = filecontents
+    }
+}
+
+// Add the file generation task to the standard build
+build.dependsOn genMetaData
+simulateExternalJavaDebug.dependsOn genMetaData
+simulateExternalJavaRelease.dependsOn genMetaData
