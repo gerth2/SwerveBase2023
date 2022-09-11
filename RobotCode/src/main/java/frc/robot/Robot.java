@@ -209,10 +209,10 @@ public class Robot extends CasseroleTimedRobot {
     stt.mark("Operator Input");
 
     /////////////////////////////////////
-    // Drivetrain Input Mapping, with vision alignment
+    // Drivetrain Input Mapping
     double fwdRevSpdCmd_mps = di.getFwdRevCmd_mps();
     double leftRightSpdCmd_mps = di.getSideToSideCmd_mps();
-    double rotateCmd_radpersec = 0;
+    double rotateCmd_radpersec = di.getRotateCmd_rps();
 
     if(di.getRobotRelative()){
       dt.setCmdRobotRelative(fwdRevSpdCmd_mps, leftRightSpdCmd_mps, rotateCmd_radpersec);
