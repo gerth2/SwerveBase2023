@@ -44,7 +44,7 @@ public class CasserolePhotonCam {
 
         for(PhotonTrackedTarget t : tgtList){
             Transform2d camToTargetTrans = t.getCameraToTarget();
-            Transform2d targetTransform = Constants.VISION_FAR_TGT_LOCATION; // TODO - needs to be looked up by AprilTag identifier
+            Transform2d targetTransform = Constants.VISION_NEAR_TGT_LOCATION; // TODO - needs to be looked up by AprilTag identifier
             Pose2d targetPose = fieldPose.transformBy(targetTransform);
             Pose2d camPose = targetPose.transformBy(camToTargetTrans.inverse());
             Pose2d visionEstPose = camPose.transformBy(robotToCam.inverse());   

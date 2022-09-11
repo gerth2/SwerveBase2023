@@ -14,7 +14,7 @@ public class VisionSystem {
 
     //Configure these to match the targets we'll see on the field.
     Pose2d fieldOrigin = new Pose2d();
-    Pose2d farTargetPose = fieldOrigin.transformBy(Constants.VISION_FAR_TGT_LOCATION);
+    Pose2d farTargetPose = fieldOrigin.transformBy(Constants.VISION_NEAR_TGT_LOCATION);
     //TODO add more targets here
 
     //200mm AprilTags
