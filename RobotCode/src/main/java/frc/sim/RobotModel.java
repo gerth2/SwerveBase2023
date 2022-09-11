@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.simulation.PDPSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import frc.Constants;
-import frc.UnitUtils;
 import frc.lib.Signal.Annotations.Signal;
 
 public class RobotModel {

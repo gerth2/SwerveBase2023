@@ -11,5 +11,16 @@
         }
       }
     }
+  },
+  "NetworkTables": {
+    "photonvision": {
+      "FRONT_CAM": {
+        "open": true
+      },
+      "REAR_CAM": {
+        "open": true
+      },
+      "open": true
+    }
   }
 }

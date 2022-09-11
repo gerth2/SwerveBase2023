@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import edu.wpi.first.wpilibj.Timer;
 import frc.lib.Signal.Signal;
 import frc.lib.Util.CrashTracker;
 import frc.robot.Robot;

@@ -27,7 +27,6 @@ import frc.robot.Drivetrain.DrivetrainControl;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.util.Units;
 
 /**
  * Interface into the Casserole autonomous sequencer for a path-planned traversal. Simply wraps

@@ -31,11 +31,16 @@ public class Constants {
     static public final double WHEEL_FUDGE_FACTOR = 0.9238; // carpet roughtop scrub factor
     static public final double WHEEL_RADIUS_IN = 4.0/2.0 * WHEEL_FUDGE_FACTOR; //four inch diameter wheels - https://www.swervedrivespecialties.com/collections/mk4i-parts/products/billet-wheel-4d-x-1-5w-bearing-bore
 
-
+    // Mechanical mounting offsets of the encoder & magnet within the shaft
+    // Must be updated whenever the module is reassembled
     static public final double FL_ENCODER_MOUNT_OFFSET_RAD = -2.157;
     static public final double FR_ENCODER_MOUNT_OFFSET_RAD = -1.575;
     static public final double BL_ENCODER_MOUNT_OFFSET_RAD = -2.180;
     static public final double BR_ENCODER_MOUNT_OFFSET_RAD = -0.803;
+
+    // Location of vision cameras relative to robot center - currently front and back
+    static public final Transform2d robotToFrontCameraTrans = new Transform2d(new Translation2d(WHEEL_BASE_HALF_WIDTH_M, 0), Rotation2d.fromDegrees(0.0));
+    static public final Transform2d robotToRearCameraTrans = new Transform2d(new Translation2d(-1.0*WHEEL_BASE_HALF_WIDTH_M, 0), Rotation2d.fromDegrees(180.0));
 
     //////////////////////////////////////////////////////////////////
     // Electrical
@@ -140,7 +145,7 @@ public class Constants {
     public static final double TAXI_DRIVE_TIME_S = 2.2;
     public static final double TAXI_DRIVE_SPEED_MPS = 1.75;
 
-    //////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////W
     // Nominal Sample Times
     //////////////////////////////////////////////////////////////////
     public static final double Ts = 0.02;
@@ -155,6 +160,9 @@ public class Constants {
     static public final Translation2d MIN_ROBOT_TRANSLATION = new Translation2d(0.0,0.0);
     // Assumed starting location of the robot. Auto routines will pick their own location and update this.
     public static final Pose2d DFLT_START_POSE = new Pose2d(3, 3, new Rotation2d(0));
+    // Expected vision target locations on the field
+    static public final Transform2d VISION_FAR_TGT_LOCATION   = new Transform2d( new Translation2d(FIELD_LENGTH_M, Units.feetToMeters(9.8541)), Rotation2d.fromDegrees(0));
+    static public final Transform2d VISION_NEAR_TGT_LOCATION  = new Transform2d( new Translation2d(Units.feetToMeters(0), Units.feetToMeters(17.14)), Rotation2d.fromDegrees(180));
 
 
 

@@ -6,6 +6,7 @@ import frc.lib.Webserver2.Webserver2;
 import frc.lib.Webserver2.DashboardConfig.DashboardConfig;
 import frc.lib.Webserver2.DashboardConfig.SwerveStateTopicSet;
 import frc.robot.Autonomous.Autonomous;
+import frc.robot.Drivetrain.DrivetrainPoseEstimator;
 
 
 public class Dashboard {
@@ -85,6 +86,8 @@ public class Dashboard {
       }
     
       public void updateDriverView() {
+
+        visionTargetVisible = DrivetrainPoseEstimator.getInstance().getVisionTargetsVisible();
 
 
         //master caution handling
