@@ -41,6 +41,10 @@ public class DriverInput {
     @Signal (units="cmd")
     double sideToSideSlewCmd;
 
+    @Signal(units="bool")
+    boolean spinMoveCmd;
+    @Signal(units="bool")
+    boolean driveToCenterCmd;
 
     @Signal(units="bool")
     boolean resetOdometry;
@@ -100,6 +104,9 @@ public class DriverInput {
             robotRelative = driverController.getRightBumper();
 
             resetOdometry = resetOdoDbnc.calculate(driverController.getAButton());
+
+            spinMoveCmd = driverController.getBButton();
+            driveToCenterCmd = driverController.getXButton();
  
            
 
@@ -161,6 +168,14 @@ public class DriverInput {
 
     public boolean getOdoResetCmd(){
         return resetOdometry;
+    }
+
+    public boolean getSpinMoveCmd(){
+        return spinMoveCmd;
+    }
+
+    public boolean getDriveToCenterCmd(){
+        return driveToCenterCmd;
     }
 
 }

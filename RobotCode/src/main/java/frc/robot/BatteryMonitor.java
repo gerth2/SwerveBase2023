@@ -86,10 +86,6 @@ public class BatteryMonitor {
 		batteryAmps = pd.getTotalCurrent();
 		rioVoltage = RobotController.getBatteryVoltage();
 
-		//upperElevatorCurrent = pd.getCurrent(Constants.PD_UPPER_ELEVATOR);
-		//lowerElevatorCurrent = pd.getCurrent(Constants.PD_LOWER_ELEVATOR);
-		//intakeCurrent = pd.getCurrent(Constants.PD_INTAKE);
-
 		rioBrownOutStatus = RobotController.isBrownedOut();
 		busRail3v3 = RobotController.getVoltage3V3();
 		busRail5v = RobotController.getVoltage5V();

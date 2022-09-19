@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.TimedRobot;
 import frc.lib.Calibration.CalWrangler;
 import frc.lib.LoadMon.CasseroleRIOLoadMonitor;
 import frc.lib.LoadMon.SegmentTimeTracker;
@@ -20,6 +21,8 @@ import frc.lib.Signal.SignalWrangler;
 import frc.lib.Signal.Annotations.Signal;
 import frc.lib.Webserver2.Webserver2;
 import frc.lib.miniNT4.NT4Server;
+import frc.robot.AutoDrive.AutoDrive;
+import frc.robot.AutoDrive.AutoDrive.AutoDriveCmdState;
 import frc.robot.Autonomous.Autonomous;
 import frc.robot.Drivetrain.DrivetrainControl;
 import frc.sim.RobotModel;
@@ -30,7 +33,7 @@ import frc.sim.RobotModel;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends CasseroleTimedRobot {
+public class Robot extends TimedRobot {
 
   public static double loopStartTime;
 
@@ -45,17 +48,13 @@ public class Robot extends CasseroleTimedRobot {
   // Things
   CasseroleRIOLoadMonitor loadMon;
   BatteryMonitor batMan;
-  //Ballcolordetector bcd;
 
   // Main Driver
   DriverInput di;
 
-  // Operator/Secondary
-  DriverInput oi;
-
-
   //Drivetrain and drivetrain accessories
   DrivetrainControl dt;
+  AutoDrive ad;
 
   // Autonomous Control Utilities
   Autonomous auto;
@@ -119,11 +118,10 @@ public class Robot extends CasseroleTimedRobot {
     stt.mark("Ball Color Detector");
 
     di = new DriverInput(0);
-    oi = new DriverInput(1);
-
     stt.mark("Driver IO");
 
     dt = DrivetrainControl.getInstance();
+    ad = new AutoDrive();
     stt.mark("Drivetrain Control");
 
     auto = Autonomous.getInstance();
@@ -203,20 +201,21 @@ public class Robot extends CasseroleTimedRobot {
     di.update();
     stt.mark("Driver Input");
 
-    oi.update();
-    stt.mark("Operator Input");
-
     /////////////////////////////////////
     // Drivetrain Input Mapping
-    double fwdRevSpdCmd_mps = di.getFwdRevCmd_mps();
-    double leftRightSpdCmd_mps = di.getSideToSideCmd_mps();
-    double rotateCmd_radpersec = di.getRotateCmd_rps();
 
-    if(di.getRobotRelative()){
-      dt.setCmdRobotRelative(fwdRevSpdCmd_mps, leftRightSpdCmd_mps, rotateCmd_radpersec);
+    if(di.getSpinMoveCmd()){
+      ad.setCmd(AutoDriveCmdState.DO_A_BARREL_ROLL);
+    } else if (di.getDriveToCenterCmd()){
+      ad.setCmd(AutoDriveCmdState.DRIVE_TO_CENTER);
     } else {
-      dt.setCmdFieldRelative(fwdRevSpdCmd_mps, leftRightSpdCmd_mps, rotateCmd_radpersec);
+      ad.setCmd(AutoDriveCmdState.MANUAL);
     }
+
+    ad.setManualCommands(di.getFwdRevCmd_mps(), di.getSideToSideCmd_mps(), di.getRotateCmd_rps(), !di.getRobotRelative());
+
+    ad.update();
+
 
     if(di.getOdoResetCmd()){
       //Reset pose estimate to angle 0, but at the same translation we're at

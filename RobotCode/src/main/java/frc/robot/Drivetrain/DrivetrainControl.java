@@ -1,6 +1,5 @@
 package frc.robot.Drivetrain;
 
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -156,17 +155,17 @@ public class DrivetrainControl {
     // The autonomous routine must still step through the trajectory over time.
     // At before each drivetrain update() call, auto should call this with the current 
     // state along the trajectory.
-    public void setCmdTrajectory(Trajectory.State desTrajState, Rotation2d desAngle,  Rotation2d desAngVel){
-        setCmdTrajectory(desTrajState, desAngle, desAngVel, false);
+    public void setCmdTrajectory(SwerveTrajectoryCmd cmd){
+        setCmdTrajectory(cmd, false);
     }
 
     // Autonomous-centric way to command the drivetrain via a Trajectory.
     // The autonomous routine must still step through the trajectory over time.
     // At before each drivetrain update() call, auto should call this with the current 
     // state along the trajectory.
-    public void setCmdTrajectory(Trajectory.State desTrajState, Rotation2d desAngle, Rotation2d desAngVel, boolean initAngleOnly){
-        desChSpd = hdc.calculate(pe.getEstPose(), desTrajState, desAngle, desAngVel);
-        curDesPose = new Pose2d(desTrajState.poseMeters.getTranslation(), desAngle);
+    public void setCmdTrajectory(SwerveTrajectoryCmd cmd, boolean initAngleOnly){
+        desChSpd = hdc.calculate(pe.getEstPose(), cmd.desTrajState, cmd.desAngle, cmd.desAngVel);
+        curDesPose = new Pose2d(cmd.desTrajState.poseMeters.getTranslation(), cmd.desAngle);
         this.initAngleOnly = initAngleOnly;
     }
 

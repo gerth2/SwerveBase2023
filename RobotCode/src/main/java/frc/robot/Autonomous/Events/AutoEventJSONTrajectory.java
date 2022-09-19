@@ -25,6 +25,7 @@ import frc.Constants;
 import frc.lib.AutoSequencer.AutoEvent;
 import frc.robot.PoseTelemetry;
 import frc.robot.Drivetrain.DrivetrainControl;
+import frc.robot.Drivetrain.SwerveTrajectoryCmd;
 
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
@@ -88,7 +89,9 @@ public class AutoEventJSONTrajectory extends AutoEvent {
             Rotation2d nextHeading = nextState.holonomicRotation;
             Rotation2d curHeadingVel = nextHeading.minus(curHeading).times(1.0 / (Constants.Ts));
 
-            dt_inst.setCmdTrajectory(curState, curHeading, curHeadingVel, false);
+            SwerveTrajectoryCmd cmd = new SwerveTrajectoryCmd(curState, curHeading, curHeadingVel);
+
+            dt_inst.setCmdTrajectory(cmd, false);
 
             //Populate desired pose from path plan.
             PoseTelemetry.getInstance().setDesiredPose(curState.poseMeters);
@@ -100,7 +103,9 @@ public class AutoEventJSONTrajectory extends AutoEvent {
             PathPlannerState curState = (PathPlannerState)  path.sample(0.0);
             Rotation2d curHeading = curState.holonomicRotation;
 
-            dt_inst.setCmdTrajectory(curState, curHeading, new Rotation2d(), true);
+            SwerveTrajectoryCmd cmd = new SwerveTrajectoryCmd(curState, curHeading, new Rotation2d());
+
+            dt_inst.setCmdTrajectory(cmd, true);
 
             //Populate desired pose from path plan.
             PoseTelemetry.getInstance().setDesiredPose(curState.poseMeters);
