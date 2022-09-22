@@ -14,9 +14,31 @@ public class DynamicSwerveWaypointSet {
     public Pose2d end;
     public Rotation2d endRot;
 
+    /**
+     * Starts a waypoint set with nothing configured. Requires the user manually specify each component later on.
+     */
     public DynamicSwerveWaypointSet(){};
 
-    public DynamicSwerveWaypointSet(Pose2d start, Rotation2d startRot,   List<Translation2d> interiorWaypoints,  Pose2d end, Rotation2d endRot){
+    /**
+     * Init's a set of waypoints that goes from one transaltion ( just x/y coordinates) to another, adjusting the rotations to match 
+     * a minimal-movement vector betweeen the start/end points
+     * @param startPosition
+     * @param endPosition
+     */
+    public DynamicSwerveWaypointSet(Translation2d startPosition, Translation2d endPosition){
+
+    }
+
+    /**
+     * Init's a complete waypoint set, where the user manually specifies (up front) all of the starting and ending
+     * Poses and rotations.
+     * @param start
+     * @param startRot
+     * @param interiorWaypoints
+     * @param end
+     * @param endRot
+     */
+    public DynamicSwerveWaypointSet(Pose2d start, Rotation2d startRot, List<Translation2d> interiorWaypoints,  Pose2d end, Rotation2d endRot){
         this.start = start;
         this.startRot = startRot;
         this.interiorWaypoints = interiorWaypoints;

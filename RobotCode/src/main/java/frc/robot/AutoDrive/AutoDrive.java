@@ -103,6 +103,8 @@ public class AutoDrive {
             waypoints.startRot = dt.getCurEstPose().getRotation();
             waypoints.interiorWaypoints = new ArrayList<Translation2d>();
 
+            //TODO rotation2d for start/end needs to be along the vector from start to end
+
             // Pick waypoint ends based on the command
             if(curCmd == AutoDriveCmdState.DRIVE_TO_CENTER){
                 waypoints.end = new Pose2d( new Translation2d(Units.feetToMeters(54/2), Units.feetToMeters(27/2)), waypoints.startRot);
