@@ -34,10 +34,20 @@ public class DynamicSwerveTrajectoryGenerator {
     Runnable backgroundGen = new Runnable() {
 
         public void run() {
+
+            //Calcualte starting rotation that gets us cleanly from start to end
+            var initVelVector = waypoints.end.minus(waypoints.start);
+            var trajStartRot = new Rotation2d(initVelVector.getX(), initVelVector.getY());
+            var trajEndRot = new Rotation2d(initVelVector.getX(), initVelVector.getY());
+
+
+            Pose2d start = new Pose2d(waypoints.start.getTranslation(), trajStartRot);
+            Pose2d end = new Pose2d(waypoints.end.getTranslation(), trajEndRot);
+
             curTraj = TrajectoryGenerator.generateTrajectory(
-                waypoints.start,
+                start,
                 waypoints.interiorWaypoints,
-                waypoints.end,
+                end,
                 config);
 
             trajDeltaRot = waypoints.endRot.minus(waypoints.startRot);
@@ -67,7 +77,6 @@ public class DynamicSwerveTrajectoryGenerator {
     public SwerveTrajectoryCmd getCurCmd(){
         curTrajectoryTime_s = Timer.getFPGATimestamp() - trajStart_s;
 
-        //TODO these should probably be grouped into a swerve trajectory class
         Trajectory.State curState = curTraj.sample(curTrajectoryTime_s);
         Rotation2d curHeading = waypoints.startRot.plus(trajDeltaRot.times(curTrajectoryTime_s/trajLen_s)); 
         Rotation2d nextHeading = waypoints.startRot.plus(trajDeltaRot.times((curTrajectoryTime_s+Constants.Ts)/trajLen_s)); 

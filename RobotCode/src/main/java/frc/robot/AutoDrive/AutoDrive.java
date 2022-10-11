@@ -65,7 +65,10 @@ public class AutoDrive {
 
     DynamicSwerveTrajectoryGenerator curTraj = null;
 
-
+    //Holonomic specific - the heading (direction we point the front of the robot in)
+    // is independent of the velocity direction of the trajectory
+    Rotation2d startHeading;
+    Rotation2d endHeading;
 
     public AutoDrive(){
 
@@ -99,24 +102,26 @@ public class AutoDrive {
             //TODO - we assume the start of the trajectory is where we're at now, not where
             // we're actually at once the trajectory starts. todo... maybe mark the
             // current time and advance the time of the trajectory by the calculation time?
+
+            //Most of these are reasonable defaults and get overwritten based on current command.
             waypoints.start = dt.getCurEstPose();
             waypoints.startRot = dt.getCurEstPose().getRotation();
             waypoints.interiorWaypoints = new ArrayList<Translation2d>();
-
-            //TODO rotation2d for start/end needs to be along the vector from start to end
+            waypoints.end = waypoints.start;
+            waypoints.endRot = waypoints.startRot;
 
             // Pick waypoint ends based on the command
             if(curCmd == AutoDriveCmdState.DRIVE_TO_CENTER){
                 waypoints.end = new Pose2d( new Translation2d(Units.feetToMeters(54/2), Units.feetToMeters(27/2)), waypoints.startRot);
-                waypoints.endRot = waypoints.startRot;
             } else if(curCmd == AutoDriveCmdState.DO_A_BARREL_ROLL){
                 waypoints.end = waypoints.start.transformBy(new Transform2d( new Translation2d(3.0, 3.0), new Rotation2d()));
-                waypoints.endRot = waypoints.startRot.plus(Rotation2d.fromDegrees(180.0));
+            }
 
-            } else {
-                //should never get here, so just pick a sane default of no trajectory.
-                waypoints.end = waypoints.start;
-                waypoints.endRot = waypoints.startRot;
+            //Calcualte the end Heading based on how we want our path to end
+            if(curCmd == AutoDriveCmdState.DRIVE_TO_CENTER){
+                waypoints.endRot = Rotation2d.fromDegrees(0.0); //pointed downfield
+            } else if(curCmd == AutoDriveCmdState.DO_A_BARREL_ROLL){
+                waypoints.endRot = waypoints.startRot.plus(Rotation2d.fromDegrees(180.0));
             }
 
             // Start the dynamic generation
