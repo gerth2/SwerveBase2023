@@ -4,6 +4,7 @@ package frc.robot.Drivetrain;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -61,8 +62,13 @@ public class DrivetrainPoseEstimator {
 
         gyro = new CasseroleADXRS453();
 
-        m_poseEstimator = new SwerveDrivePoseEstimator(getGyroHeading(), 
+        SwerveModuleState[] initialStates = DrivetrainControl.getInstance().getModuleActualStates();
+
+
+        m_poseEstimator = new SwerveDrivePoseEstimator( Nat.N7(), Nat.N5(), Nat.N7(),
+                                                       getGyroHeading(), 
                                                        Constants.DFLT_START_POSE, 
+                                                       initialStates,
                                                        Constants.m_kinematics, 
                                                        stateStdDevs, 
                                                        localMeasurementStdDevs, 
@@ -92,7 +98,7 @@ public class DrivetrainPoseEstimator {
         //Based on gyro and measured module speeds and positions, estimate where our robot should have moved to.
         SwerveModuleState[] states = DrivetrainControl.getInstance().getModuleActualStates();
         Pose2d prevEstPose = curEstPose;
-        curEstPose = m_poseEstimator.update(getGyroHeading(), states[0], states[1], states[2], states[3]);
+        //curEstPose = m_poseEstimator.update(getGyroHeading(), states[0], states[1], states[2], states[3]);
 
         //Calculate a "speedometer" velocity in ft/sec
         Transform2d deltaPose = new Transform2d(prevEstPose, curEstPose);
@@ -101,7 +107,7 @@ public class DrivetrainPoseEstimator {
         for(var cam : cams){
             cam.update();
             for(var obs : cam.getCurObservations()){
-                m_poseEstimator.addVisionMeasurement(obs.estFieldPose, obs.time, visionMeasurementStdDevs.times(1.0/obs.trustworthiness));
+                //m_poseEstimator.addVisionMeasurement(obs.estFieldPose, obs.time, visionMeasurementStdDevs.times(1.0/obs.trustworthiness));
             }
         }
 

@@ -1,8 +1,6 @@
-import edu.wpi.first.gradlerio.deploy.roborio.RoboRIO
-
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2022.4.1"
+    id "edu.wpi.first.GradleRIO" version "2023.1.1-beta-3"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -67,9 +65,9 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.1'
 
-    // Webserver2 requirements
+        // Webserver2 requirements
     implementation group: 'org.eclipse.jetty', name: 'jetty-http', version: '9.3.9.v20160517'
     implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.3.9.v20160517'
     implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.3.9.v20160517'
@@ -105,6 +103,12 @@ jar {
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
+
+// Configure string concat to always inline compile
+tasks.withType(JavaCompile) {
+    options.compilerArgs.add '-XDstringConcat=inline'
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

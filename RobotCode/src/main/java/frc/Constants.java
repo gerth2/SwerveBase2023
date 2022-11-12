@@ -5,8 +5,11 @@ import java.util.List;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
@@ -39,8 +42,8 @@ public class Constants {
     static public final double BR_ENCODER_MOUNT_OFFSET_RAD = -0.803;
 
     // Location of vision cameras relative to robot center - currently front and back
-    static public final Transform2d robotToFrontCameraTrans = new Transform2d(new Translation2d(WHEEL_BASE_HALF_WIDTH_M, 0), Rotation2d.fromDegrees(0.0));
-    static public final Transform2d robotToRearCameraTrans = new Transform2d(new Translation2d(-1.0*WHEEL_BASE_HALF_WIDTH_M, 0), Rotation2d.fromDegrees(180.0));
+    static public final Transform3d robotToFrontCameraTrans = new Transform3d(new Translation3d(WHEEL_BASE_HALF_WIDTH_M, 0, 1.0), new Rotation3d(0.0,0.0,0.0));
+    static public final Transform3d robotToRearCameraTrans = new Transform3d(new Translation3d(-1.0*WHEEL_BASE_HALF_WIDTH_M, 0, 1.0), new Rotation3d(0.0,0.0,Math.PI));
 
     //////////////////////////////////////////////////////////////////
     // Electrical
@@ -161,8 +164,9 @@ public class Constants {
     // Assumed starting location of the robot. Auto routines will pick their own location and update this.
     public static final Pose2d DFLT_START_POSE = new Pose2d(3, 3, new Rotation2d(0));
     // Expected vision target locations on the field
-    static public final Transform2d VISION_FAR_TGT_LOCATION   = new Transform2d( new Translation2d(FIELD_LENGTH_M, Units.feetToMeters(9.8541)), Rotation2d.fromDegrees(0));
-    static public final Transform2d VISION_NEAR_TGT_LOCATION  = new Transform2d( new Translation2d(Units.feetToMeters(0), Units.feetToMeters(17.14)), Rotation2d.fromDegrees(180));
+    // TODO - Use Actual Poses
+    static public final Transform3d VISION_FAR_TGT_LOCATION   = new Transform3d( new Translation3d(FIELD_LENGTH_M, Units.feetToMeters(9.8541), 1.0), new Rotation3d(0,0,0));
+    static public final Transform3d VISION_NEAR_TGT_LOCATION  = new Transform3d( new Translation3d(Units.feetToMeters(0), Units.feetToMeters(17.14), 1.0), new Rotation3d(0, 0, Math.PI));
 
 
 

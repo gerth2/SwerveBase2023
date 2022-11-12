@@ -4,6 +4,7 @@ import org.photonvision.SimVisionSystem;
 import org.photonvision.SimVisionTarget;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
 import frc.Constants;
 
@@ -13,8 +14,8 @@ public class VisionSystem {
     // Simulated Vision System.
 
     //Configure these to match the targets we'll see on the field.
-    Pose2d fieldOrigin = new Pose2d();
-    Pose2d farTargetPose = fieldOrigin.transformBy(Constants.VISION_NEAR_TGT_LOCATION);
+    Pose3d fieldOrigin = new Pose3d();
+    Pose3d farTargetPose = fieldOrigin.transformBy(Constants.VISION_NEAR_TGT_LOCATION);
     //TODO add more targets here
 
     //200mm AprilTags
@@ -36,40 +37,43 @@ public class VisionSystem {
     int camResolutionHeight = 480; // pixels
     double minTargetArea = 10; // square pixels
 
-    SimVisionSystem simVisionFront =
-    new SimVisionSystem(
-            "FRONT_CAM",
-            camDiagFOV,
-            camPitch,
-            Constants.robotToFrontCameraTrans.inverse(),
-            camHeightOffGround,
-            maxLEDRange,
-            camResolutionWidth,
-            camResolutionHeight,
-            minTargetArea);
+    //TODO - need to pull latest photonvision for this
+    //SimVisionSystem simVisionFront =
+    //new SimVisionSystem(
+    //        "FRONT_CAM",
+    //        camDiagFOV,
+    //        camPitch,
+    //        Constants.robotToFrontCameraTrans.inverse(),
+    //        camHeightOffGround,
+    //        maxLEDRange,
+    //        camResolutionWidth,
+    //        camResolutionHeight,
+    //        minTargetArea);
 
     
-    SimVisionSystem simVisionRear =
-    new SimVisionSystem(
-            "REAR_CAM",
-            camDiagFOV,
-            camPitch,
-            Constants.robotToRearCameraTrans.inverse(),
-            camHeightOffGround,
-            maxLEDRange,
-            camResolutionWidth,
-            camResolutionHeight,
-            minTargetArea);
+    //SimVisionSystem simVisionRear =
+    //new SimVisionSystem(
+    //        "REAR_CAM",
+    //        camDiagFOV,
+    //        camPitch,
+    //        Constants.robotToRearCameraTrans.inverse(),
+    //        camHeightOffGround,
+    //        maxLEDRange,
+    //        camResolutionWidth,
+    //        camResolutionHeight,
+    //        minTargetArea);
 
 
     public VisionSystem(){
-        simVisionFront.addSimVisionTarget(new SimVisionTarget(farTargetPose, targetHeight/2, targetWidth, targetHeight));
-        simVisionRear.addSimVisionTarget(new SimVisionTarget(farTargetPose, targetHeight/2, targetWidth, targetHeight));
+        //TODO - pick up latest photonvision to support this
+        //simVisionFront.addSimVisionTarget(new SimVisionTarget(farTargetPose, targetHeight/2, targetWidth, targetHeight));
+        //simVisionRear.addSimVisionTarget(new SimVisionTarget(farTargetPose, targetHeight/2, targetWidth, targetHeight));
     }
 
     public void update(Pose2d curPose){
-        simVisionFront.processFrame(curPose);
-        simVisionRear.processFrame(curPose);
+        //TODO - pick up latest photonvision to support this
+        //simVisionFront.processFrame(curPose);
+        //simVisionRear.processFrame(curPose);
     }
     
 }
