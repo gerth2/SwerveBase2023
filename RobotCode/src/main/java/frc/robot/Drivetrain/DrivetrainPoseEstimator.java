@@ -36,7 +36,7 @@ public class DrivetrainPoseEstimator {
 
     CasseroleADXRS453 gyro;
 
-    SwerveDrivePoseEstimator m_poseEstimator;
+    //SwerveDrivePoseEstimator m_poseEstimator;
 
     List<CasserolePhotonCam> cams = new ArrayList<CasserolePhotonCam>();
 
@@ -65,15 +65,15 @@ public class DrivetrainPoseEstimator {
         SwerveModuleState[] initialStates = DrivetrainControl.getInstance().getModuleActualStates();
 
 
-        m_poseEstimator = new SwerveDrivePoseEstimator( Nat.N7(), Nat.N5(), Nat.N7(),
-                                                       getGyroHeading(), 
-                                                       Constants.DFLT_START_POSE, 
-                                                       initialStates,
-                                                       Constants.m_kinematics, 
-                                                       stateStdDevs, 
-                                                       localMeasurementStdDevs, 
-                                                       visionMeasurementStdDevs, 
-                                                       Constants.Ts);
+        //m_poseEstimator = new SwerveDrivePoseEstimator( Nat.N7(), Nat.N5(), Nat.N7(),
+        //                                               getGyroHeading(), 
+        //                                               Constants.DFLT_START_POSE, 
+        //                                               initialStates,
+        //                                               Constants.m_kinematics, 
+        //                                               stateStdDevs, 
+        //                                               localMeasurementStdDevs, 
+        //                                               visionMeasurementStdDevs, 
+        //                                               Constants.Ts);
 
     }
 
@@ -84,7 +84,7 @@ public class DrivetrainPoseEstimator {
     public void setKnownPose(Pose2d in){
         DrivetrainControl.getInstance().resetWheelEncoders();
         gyro.reset(in.getRotation().getRadians());
-        m_poseEstimator.resetPosition(in, in.getRotation());
+        //m_poseEstimator.resetPosition(in, in.getRotation());
         curEstPose = in;
     }
 
