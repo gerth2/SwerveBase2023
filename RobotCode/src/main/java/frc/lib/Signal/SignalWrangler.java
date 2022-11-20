@@ -9,11 +9,8 @@ import java.util.Set;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.Logging.SignalFileLogger;
-import frc.lib.miniNT4.LocalClient;
-import frc.lib.miniNT4.samples.TimestampedValue;
-import frc.lib.miniNT4.topics.Topic;
 
-public class SignalWrangler extends LocalClient{
+public class SignalWrangler {
 
     /* Singleton infrastructure */
     private static SignalWrangler instance;
@@ -177,21 +174,6 @@ public class SignalWrangler extends LocalClient{
         for(AutoDiscoveredSignal sig : autoSig){
             sig.addSample(sampleTime);
         }
-    }
-
-    @Override
-    public void onAnnounce(Topic newTopic) {
-        // DO Nothing - Signals do not care about new topic announcements
-    }
-
-    @Override
-    public void onUnannounce(Topic deadTopic) {
-        // DO Nothing - Signals do not care about topic unannouncments        
-    }
-
-    @Override
-    public void onValueUpdate(Topic topic, TimestampedValue newVal){
-        // Do Nothing - Signals do care about another entity changing their value.
     }
 
 }

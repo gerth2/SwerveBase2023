@@ -12,6 +12,8 @@ import org.photonvision.PhotonCamera;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.lib.Calibration.CalWrangler;
@@ -20,7 +22,6 @@ import frc.lib.LoadMon.SegmentTimeTracker;
 import frc.lib.Signal.SignalWrangler;
 import frc.lib.Signal.Annotations.Signal;
 import frc.lib.Webserver2.Webserver2;
-import frc.lib.miniNT4.NT4Server;
 import frc.robot.AutoDrive.AutoDrive;
 import frc.robot.AutoDrive.AutoDrive.AutoDriveCmdState;
 import frc.robot.Autonomous.Autonomous;
@@ -91,7 +92,7 @@ public class Robot extends TimedRobot {
     LiveWindow.disableAllTelemetry();
     stt.mark("LW Disable");
 
-    NT4Server.getInstance(); // Ensure it starts
+    NetworkTableInstance.getDefault().startServer();
     stt.mark("NT4");
 
 
@@ -140,7 +141,6 @@ public class Robot extends TimedRobot {
     CalWrangler.getInstance().subscribeAll();
     stt.mark("Cal Wrangler Subscription");
 
-    NT4Server.getInstance().startServer();
     webserver.startServer();
     stt.mark("Webserver Startup");
 

@@ -1,11 +1,9 @@
 package frc.lib.Calibration;
 
+import edu.wpi.first.networktables.DoubleTopic;
+import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.lib.miniNT4.NT4Server;
-import frc.lib.miniNT4.NT4TypeStr;
-import frc.lib.miniNT4.samples.TimestampedDouble;
-import frc.lib.miniNT4.samples.TimestampedString;
-import frc.lib.miniNT4.topics.Topic;
+
 
 /*
  *******************************************************************************************
@@ -72,11 +70,11 @@ public class Calibration {
     /** Lower limit on the allowed calibration range */
     public double min_cal;
 
-    Topic calUnitsTopic;
-    Topic calMinTopic;
-    Topic calMaxTopic;
-    Topic calDefaultTopic;
-    Topic calValueTopic;
+    StringTopic calUnitsTopic;
+    DoubleTopic calMinTopic;
+    DoubleTopic calMaxTopic;
+    DoubleTopic calDefaultTopic;
+    DoubleTopic calValueTopic;
 
     /**
      * Constructor for a new calibratable value.
