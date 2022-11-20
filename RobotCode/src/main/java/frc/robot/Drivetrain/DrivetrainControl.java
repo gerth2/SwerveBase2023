@@ -5,6 +5,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -248,6 +249,14 @@ public class DrivetrainControl {
                                         moduleFR.getActualState(),
                                         moduleBL.getActualState(),
                                         moduleFR.getActualState()};
+        return retArr;
+    }
+
+    public SwerveModulePosition [] getModuleActualPositions(){
+        SwerveModulePosition retArr[] =  { moduleFL.getActualPosition(),
+                                           moduleFR.getActualPosition(),
+                                           moduleBL.getActualPosition(),
+                                           moduleFR.getActualPosition()};
         return retArr;
     }
 

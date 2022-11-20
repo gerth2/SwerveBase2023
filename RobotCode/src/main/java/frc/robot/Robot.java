@@ -102,12 +102,6 @@ public class Robot extends TimedRobot {
     CalWrangler.getInstance();
     stt.mark("Cal Wrangler");
 
-    pt = PoseTelemetry.getInstance();
-    stt.mark("Pose Telemetry");
-
-    db = new Dashboard(webserver);
-    stt.mark("Dashboard");
-
     loadMon = new CasseroleRIOLoadMonitor();
     stt.mark("RIO Load Monitor");
 
@@ -128,12 +122,17 @@ public class Robot extends TimedRobot {
     auto.loadSequencer();
     stt.mark("Autonomous");
 
+    pt = PoseTelemetry.getInstance();
+    stt.mark("Pose Telemetry");
+
+    db = new Dashboard(webserver);
+    stt.mark("Dashboard");
+
     if(Robot.isSimulation()){
       simulationSetup();
     }
     syncSimPoseToEstimate();
     stt.mark("Simulation");
-
 
     SignalWrangler.getInstance().registerSignals(this);
     stt.mark("Signal Registration");

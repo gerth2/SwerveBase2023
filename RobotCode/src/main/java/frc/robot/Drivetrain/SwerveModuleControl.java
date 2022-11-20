@@ -2,6 +2,7 @@ package frc.robot.Drivetrain;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
@@ -112,6 +113,11 @@ class SwerveModuleControl {
 
     public void setDesiredState(SwerveModuleState des){
         desState = des;
+    }
+
+    public SwerveModulePosition getActualPosition(){
+        double wheelPosMeters = UnitUtils.dtMotorSpeedToLinearSpeed_mps(wheelMotorCtrl.getPosition_rad());
+        return new SwerveModulePosition(wheelPosMeters, new Rotation2d(azmth_enc.getAngle_rad()));
     }
 
     public SwerveModuleState getActualState(){

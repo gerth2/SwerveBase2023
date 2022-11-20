@@ -50,8 +50,8 @@ public class Constants {
     //////////////////////////////////////////////////////////////////
 
     // PWM Bank
-    static public final int VERT_INTAKE_SPARK_MOTOR = 0;
-    static public final int LED_CONTROLLER_PORT = 1; 
+    //static public final int UNUSED = 0;
+    //static public final int UNUSED = 1;
     //static public final int UNUSED = 2;
     //static public final int UNUSED = 3;
     //static public final int UNUSED = 4;
@@ -66,18 +66,19 @@ public class Constants {
     static public final int FR_AZMTH_ENC_IDX = 1;
     static public final int BL_AZMTH_ENC_IDX = 2;
     static public final int BR_AZMTH_ENC_IDX = 3;
-    static public final int ELEVATOR_LOWER_BALL_SENSOR = 4;
-    static public final int ELEVATOR_UPPER_BALL_SENSOR = 5;
-    static public final int SHOOTER_FEED_ENC_A = 6;
-    static public final int SHOOTER_FEED_ENC_B = 7;
-    static public final int SHOOTER_LAUNCH_ENC_A = 8;
-    static public final int SHOOTER_LAUNCH_ENC_B = 9;
+    //static public final int UNUSED = 4;
+    //static public final int UNUSED = 5;
+    //static public final int UNUSED = 6;
+    //static public final int UNUSED = 7;
+    //static public final int UNUSED = 8;
+    //static public final int UNUSED = 9;
+
 
     // Analog Bank
     //static public final int UNUSED = 0;
     //static public final int UNUSED = 1;
     //static public final int UNUSED = 2;
-    static public final int PRESSURE_SENSOR_ANALOG = 3;
+    //static public final int UNUSED = 3;
 
     // CAN Bus Addresses - Motors
     //static public final int RESERVED_DO_NOT_USE = 0; // default for most stuff
@@ -90,24 +91,24 @@ public class Constants {
     static public final int BL_AZMTH_MOTOR_CANID = 7;
     static public final int BR_WHEEL_MOTOR_CANID = 8;
     static public final int BR_AZMTH_MOTOR_CANID = 9;
-    static public final int SHOOTER_MOTOR_CANID = 10;
-    static public final int HORIZ_INTAKE_MOTOR_CANID  = 11;
+    //static public final int UNUSED = 10;
+    //static public final int UNUSED = 11;
     //static public final int UNUSED = 12;
     //static public final int UNUSED = 13;
     //static public final int UNUSED = 14;
-    static public final int SHOOTER_FEED_MOTOR_CANID = 15; // AKA Elevator Upper Motor
-    static public final int ELEVATOR_LOWER_CANID = 16;
+    //static public final int UNUSED = 15;
+    //static public final int UNUSED = 16;
     //static public final int UNUSED = 17;
 
     // Pneumatics Hub
-    static public final int CLIMBER_LIFT_SOL_1_RETRACT = 0;
-    static public final int CLIMBER_LIFT_SOL_2_RETRACT = 1;
-    static public final int CLIMBER_LIFT_SOL_1_EXTEND = 2;
-    static public final int CLIMBER_LIFT_SOL_2_EXTEND = 3;
-    static public final int CLIMBER_TILT_SOL_EXTEND = 5;
-    static public final int CLIMBER_TILT_SOL_RETRACT = 6;
+    //static public final int UNUSED = 0;
+    //static public final int UNUSED = 1;
+    //static public final int UNUSED = 2;
+    //static public final int UNUSED = 3;
+    //static public final int UNUSED = 4;
+    //static public final int UNUSED = 5;
     //static public final int UNUSED = 6;
-    static public final int INTAKE_SOLENOID = 7; 
+    //static public final int UNUSED = 7;
     //static public final int UNUSED = 8;
     //static public final int UNUSED = 9; 
 
@@ -115,8 +116,8 @@ public class Constants {
     //static public final int UNUSED = 0;
     //static public final int UNUSED = 1;
     //static public final int UNUSED = 2;
-    static public final int PD_UPPER_ELEVATOR = 3;
-    static public final int PD_LOWER_ELEVATOR = 4;
+    //static public final int UNUSED = 3;
+    //static public final int UNUSED = 4;
     //static public final int UNUSED = 5;
     //static public final int UNUSED = 6;
     //static public final int UNUSED = 7;
@@ -128,19 +129,11 @@ public class Constants {
     //static public final int UNUSED = 13;
     //static public final int UNUSED = 14;
     //static public final int UNUSED = 15;
-    static public final int PD_INTAKE = 16;
+    //static public final int UNUSED = 16;
     //static public final int UNUSED = 17;
     //static public final int UNUSED = 18;
     //static public final int UNUSED = 19;
     
-    //////////////////////////////////////////////////////////////////
-    // Shooter Constants
-    //////////////////////////////////////////////////////////////////
-    public static final double SINGLE_BALL_SHOT_TIME = 1.5;
-    public static final double DOUBLE_BALL_SHOT_TIME = 4.0;
-    public static final double SHOOTER_FEED_ENC_REV_PER_PULSE = 1.0/2048.0; // see https://www.revrobotics.com/rev-11-1271/
-    public static final double SHOOTER_LAUNCH_ENC_REV_PER_PULSE = 1.0/2048.0; // see https://www.revrobotics.com/rev-11-1271/
-    public static final double SHOOTER_TO_ENC_RATIO = 2.69; 
 
     //////////////////////////////////////////////////////////////////
     // Time-based autonomous Constants
