@@ -29,7 +29,7 @@ public class Signal {
 
 
         nt4ValTopic   = inst.getDoubleTopic(this.getNT4ValueTopicName());
-        nt4ValTopic.setProperty("units", units);
+        nt4ValTopic.setProperty("units", "\"" + units + "\"");
 
         //The goal of a signal is to record the value of a variable every loop, for debugging down to loop-to-loop changes
         // Therefor we do want to send all vlaues over the network, and we do want to keep any duplicates.

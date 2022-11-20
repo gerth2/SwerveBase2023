@@ -1,19 +1,14 @@
 package frc.robot.Autonomous;
 
-import java.util.Set;
-
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.IntegerTopic;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.lib.AutoSequencer.AutoSequencer;
 import frc.lib.Autonomous.AutoMode;
 import frc.lib.Autonomous.AutoModeList;
 import frc.lib.Util.CrashTracker;
-import frc.lib.miniNT4.LocalClient;
-import frc.lib.miniNT4.NT4Server;
-import frc.lib.miniNT4.NT4TypeStr;
-import frc.lib.miniNT4.samples.TimestampedInteger;
-import frc.lib.miniNT4.samples.TimestampedValue;
-import frc.lib.miniNT4.topics.Topic;
 import frc.robot.Autonomous.Modes.DoNothing;
 import frc.robot.Autonomous.Modes.DriveFwd;
 import frc.robot.Autonomous.Modes.Wait;
@@ -43,10 +38,12 @@ import frc.robot.Drivetrain.DrivetrainControl;
  */
 
 
-public class Autonomous extends LocalClient  {
+public class Autonomous {
 
-    Topic curDelayModeTopic = null;
-    Topic curMainModeTopic = null;
+    IntegerTopic curDelayModeTopic;
+    IntegerTopic curMainModeTopic;
+    IntegerSubscriber curDelayModeSubscriber;
+    IntegerSubscriber curMainModeSubscriber;
 
     long curDelayMode_dashboard = 0;
     long curMainMode_dashboard = 0;
@@ -87,12 +84,13 @@ public class Autonomous extends LocalClient  {
         
 
         // Create and subscribe to NT4 topics
-        curDelayModeTopic = NT4Server.getInstance().publishTopic(delayModeList.getCurModeTopicName(), NT4TypeStr.INT, this);
-        curMainModeTopic = NT4Server.getInstance().publishTopic(mainModeList.getCurModeTopicName(), NT4TypeStr.INT, this);
-        curDelayModeTopic.submitNewValue(new TimestampedInteger(0, 0));
-        curMainModeTopic.submitNewValue(new TimestampedInteger(0, 0));
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
-        this.subscribe(Set.of(delayModeList.getDesModeTopicName(), mainModeList.getDesModeTopicName()), 0).start();
+        curDelayModeTopic = inst.getIntegerTopic(delayModeList.getCurModeTopicName());
+        curMainModeTopic  = inst.getIntegerTopic(mainModeList.getCurModeTopicName());
+
+        curDelayModeSubscriber = curDelayModeTopic.subscribe(0);
+        curMainModeSubscriber = curMainModeTopic.subscribe(0);
 
         curDelayMode = delayModeList.getDefault();
         curMainMode  = mainModeList.getDefault();
@@ -134,17 +132,15 @@ public class Autonomous extends LocalClient  {
         curMainMode.addStepsToSequencer(seq);
     
         DrivetrainControl.getInstance().setKnownPose(getStartPose());
-
-        curDelayModeTopic.submitNewValue(new TimestampedInteger(curDelayMode.idx));
-        curMainModeTopic.submitNewValue(new TimestampedInteger(curMainMode.idx));
         
     }
 
 
     /* This should be called periodically, always */
     public void update(){
+        curDelayMode_dashboard = curDelayModeSubscriber.get();
+        curMainMode_dashboard  = curMainModeSubscriber.get();
         seq.update();
-
     }
 
     /* Should be called when returning to disabled to stop and reset everything */
@@ -161,17 +157,4 @@ public class Autonomous extends LocalClient  {
         return curMainMode.getInitialPose();
     }
 
-    @Override
-    public void onAnnounce(Topic newTopic) {}
-    @Override
-    public void onUnannounce(Topic deadTopic) {}
-
-    @Override
-    public void onValueUpdate(Topic topic, TimestampedValue newVal) {
-        if(topic.name.equals(delayModeList.getDesModeTopicName())){
-            curDelayMode_dashboard = (Long) newVal.getVal();
-        } else if(topic.name.equals(mainModeList.getDesModeTopicName())){
-            curMainMode_dashboard =(Long) newVal.getVal();
-        }         
-    }
 }

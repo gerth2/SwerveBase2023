@@ -1,6 +1,11 @@
 package frc.lib.Calibration;
 
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.DoubleTopic;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -75,6 +80,14 @@ public class Calibration {
     DoubleTopic calMaxTopic;
     DoubleTopic calDefaultTopic;
     DoubleTopic calValueTopic;
+
+    StringPublisher calUnitsPublisher;
+    DoublePublisher calMinPublisher;
+    DoublePublisher calMaxPublisher;
+    DoublePublisher calDefaultPublisher;
+    DoublePublisher calValuePublisher;
+
+    DoubleSubscriber calValueSubscriber;
 
     /**
      * Constructor for a new calibratable value.
@@ -190,17 +203,27 @@ public class Calibration {
         overridden = false;
         is_updated = false;
 
-        calUnitsTopic   = NT4Server.getInstance().publishTopic(this.getUnitsTopic(),   NT4TypeStr.STR, CalWrangler.getInstance());
-        calMinTopic     = NT4Server.getInstance().publishTopic(this.getMinTopic(),     NT4TypeStr.FLOAT_64, CalWrangler.getInstance());
-        calMaxTopic     = NT4Server.getInstance().publishTopic(this.getMaxTopic(),     NT4TypeStr.FLOAT_64, CalWrangler.getInstance());
-        calDefaultTopic = NT4Server.getInstance().publishTopic(this.getDefaultTopic(), NT4TypeStr.FLOAT_64, CalWrangler.getInstance());
-        calValueTopic   = NT4Server.getInstance().publishTopic(this.getValueTopic(),   NT4TypeStr.FLOAT_64, CalWrangler.getInstance());
+        NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
-        calUnitsTopic.submitNewValue(new TimestampedString(this.units, 0));
-        calMinTopic.submitNewValue(new TimestampedDouble(this.min_cal, 0));
-        calMaxTopic.submitNewValue(new TimestampedDouble(this.max_cal, 0));
-        calDefaultTopic.submitNewValue(new TimestampedDouble(this.default_val, 0));
-        calValueTopic.submitNewValue(new TimestampedDouble(this.cur_val, 0));
+        calUnitsTopic   = inst.getStringTopic(this.getUnitsTopic());
+        calMinTopic     = inst.getDoubleTopic(this.getMinTopic());
+        calMaxTopic     = inst.getDoubleTopic(this.getMaxTopic());
+        calDefaultTopic = inst.getDoubleTopic(this.getDefaultTopic());
+        calValueTopic   = inst.getDoubleTopic(this.getValueTopic());
+
+        calUnitsPublisher   = calUnitsTopic.publish();
+        calMinPublisher     = calMinTopic.publish();   
+        calMaxPublisher     = calMaxTopic.publish();
+        calDefaultPublisher = calDefaultTopic.publish();
+        calValuePublisher   = calValueTopic.publish();
+
+        calUnitsPublisher.setDefault(this.units);
+        calMinPublisher.setDefault(this.min_cal);   //Todo - these should probably be propreties
+        calMaxPublisher.setDefault(this.max_cal);   
+        calDefaultPublisher.setDefault(this.default_val);
+        calValuePublisher.setDefault(this.cur_val);
+
+        calValueSubscriber = calValueTopic.subscribe(this.cur_val);
 
         CalWrangler.getInstance().register(this);
 
@@ -299,12 +322,15 @@ public class Calibration {
      * 
      * @param val_in Value to set.
      */
-    public void setOverride(double val_in) {
+    public void update() {
+        var val_in = calValueSubscriber.get();
         double temp = limitRange(val_in);
-        cur_val = temp;
-        overridden = true;
-        is_updated = true;
-        System.out.println("Info: Calibration " + this.name + " set to " + Double.toString(cur_val));
+        if(temp != cur_val){
+            cur_val = temp;
+            overridden = true;
+            is_updated = true;
+            System.out.println("Info: Calibration " + this.name + " set to " + Double.toString(cur_val));
+        }
     }
 
     /**

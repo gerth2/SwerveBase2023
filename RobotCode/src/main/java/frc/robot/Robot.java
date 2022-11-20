@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
   // Website utilities
   Webserver2 webserver;
   Dashboard db;
+  CalWrangler cw;
 
   // Things
   CasseroleRIOLoadMonitor loadMon;
@@ -100,7 +101,7 @@ public class Robot extends TimedRobot {
     webserver = new Webserver2();
     stt.mark("Webserver2");
 
-    CalWrangler.getInstance();
+    cw = CalWrangler.getInstance();
     stt.mark("Cal Wrangler");
 
     loadMon = new CasseroleRIOLoadMonitor();
@@ -137,9 +138,6 @@ public class Robot extends TimedRobot {
 
     SignalWrangler.getInstance().registerSignals(this);
     stt.mark("Signal Registration");
-
-    CalWrangler.getInstance().subscribeAll();
-    stt.mark("Cal Wrangler Subscription");
 
     webserver.startServer();
     stt.mark("Webserver Startup");
@@ -269,10 +267,13 @@ public class Robot extends TimedRobot {
     stt.mark("Drivetrain");
 
 
+    cw.update();
+    stt.mark("Cal Wrangler");
     db.updateDriverView();
     stt.mark("Dashboard");
     telemetryUpdate();
     stt.mark("Telemetry");
+    
 
     stt.end();
 
