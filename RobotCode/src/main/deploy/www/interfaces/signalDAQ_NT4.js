@@ -33,7 +33,7 @@ export class SignalDAQNT4 {
                                         this.topicAnnounceHandler.bind(this), 
                                         this.topicUnannounceHandler.bind(this),
                                         this.valueUpdateHandler.bind(this),
-                                        this.onConnect.bind(this),
+                                        this.localOnConnect.bind(this),
                                         this.onDisconnect.bind(this)
                                         );
 
@@ -42,10 +42,15 @@ export class SignalDAQNT4 {
         this.statusTextCallback("NT4 Connected.");
     }
 
+    localOnConnect() {
+        this.nt4Client.subscribeTopicNames(["/Signals"]);
+        this.onConnect();
+    }
+
     topicAnnounceHandler( newTopic ) {
         if(this.isSignalUnitsTopic(newTopic)){
             //If a signal units topic is announced, request what those units value actually is.
-            this.nt4Client.getValues([newTopic.name]);
+            this.nt4Client.subscribeAllSamples([newTopic.name]);
         }
     }
 

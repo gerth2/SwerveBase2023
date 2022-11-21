@@ -86,7 +86,7 @@ export class NT4_Topic{
     name = "";
     type = "";
     id = 0;
-    properties = new NT4_TopicProperties();
+    properties = {}; //Properties are free-form, might have anything in them
 
     toPublishObj(){
         return {
@@ -110,16 +110,6 @@ export class NT4_Topic{
 
     getTypeIdx(){
         return typestrIdxLookup[this.type];
-    }
-}
-
-export class NT4_TopicProperties{
-    isPersistent = false;
-
-    toUpdateObj(){
-        return {
-            "persistent": this.isPersistent,
-        }
     }
 }
 
@@ -165,12 +155,12 @@ export class NT4_Client {
     //////////////////////////////////////////////////////////////
     // PUBLIC API
 
-    // Add a new subscription. Returns a subscription object
-    subscribeImmediate(topicPatterns){
+    // Add a new subscription which requests announcment of topics
+    subscribeTopicNames(topicPatterns){
         var newSub = new NT4_Subscription();
         newSub.uid = this.getNewSubUID();
-        newSub.options.immediate = true;
-        newSub.options.periodicRate_s = 0;
+        newSub.options.topicsonly = true;
+        newSub.options.periodicRate_s = 1.0;
         newSub.topics = new Set(topicPatterns);
 
         this.subscriptions.set(newSub.uid, newSub);
@@ -184,7 +174,6 @@ export class NT4_Client {
     subscribePeriodic(topicPatterns, period){
         var newSub = new NT4_Subscription();
         newSub.uid = this.getNewSubUID();
-        newSub.options.immediate = false;
         newSub.options.periodicRate_s = period;
         newSub.topics = new Set(topicPatterns);
         
@@ -199,7 +188,6 @@ export class NT4_Client {
     subscribeAllSamples(topicPatterns){
         var newSub = new NT4_Subscription();
         newSub.uid = this.getNewSubUID();
-        newSub.options.immediate = false;
         newSub.topics = new Set(topicPatterns);
         newSub.options.all = true;
 
@@ -208,15 +196,6 @@ export class NT4_Client {
             this.ws_subscribe(newSub);
         }
         return newSub;
-    }
-
-    // Requests latest value of a set of topics
-    getValues(topicPatterns){
-        var newValReq = new NT4_ValReq();
-        newValReq.topics = new Set(topicPatterns);
-        if(this.serverConnectionActive){
-            this.ws_getvalues(newValReq);
-        }
     }
 
     // Given an existing subscription, unsubscribe from it.
@@ -347,10 +326,6 @@ export class NT4_Client {
         this.ws_sendJSON("subscribe", sub.toSubscribeObj());
     }
 
-    ws_getvalues(gv){
-        this.ws_sendJSON("getvalues", gv.toGetValsObj());
-    }
-
     ws_unsubscribe(sub){
         this.ws_sendJSON("unsubscribe", sub.toUnSubscribeObj());
     }
@@ -468,7 +443,7 @@ export class NT4_Client {
                     newTopic.name = params.name;
                     newTopic.id = params.id;
                     newTopic.type = params.type;
-                    newTopic.properties.isPersistent = params.properties.persistent;
+                    newTopic.properties = params.properties;
                     this.serverTopics.set(newTopic.id, newTopic);
                     this.onTopicAnnounce(newTopic);
                 } else if (method === "unannounce"){
