@@ -1,6 +1,7 @@
 package frc.robot.Autonomous;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.IntegerTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -42,6 +43,8 @@ public class Autonomous {
 
     IntegerTopic curDelayModeTopic;
     IntegerTopic curMainModeTopic;
+    IntegerPublisher curDelayModePublisher;
+    IntegerPublisher curMainModePublisher;
     IntegerSubscriber curDelayModeSubscriber;
     IntegerSubscriber curMainModeSubscriber;
 
@@ -92,6 +95,11 @@ public class Autonomous {
         curDelayModeSubscriber = curDelayModeTopic.subscribe(0);
         curMainModeSubscriber = curMainModeTopic.subscribe(0);
 
+        curDelayModePublisher = curDelayModeTopic.publish();
+        curMainModePublisher = curMainModeTopic.publish();
+        curDelayModePublisher.setDefault(0);
+        curMainModePublisher.setDefault(0);
+
         curDelayMode = delayModeList.getDefault();
         curMainMode  = mainModeList.getDefault();
 
@@ -130,6 +138,9 @@ public class Autonomous {
 
         curDelayMode.addStepsToSequencer(seq);
         curMainMode.addStepsToSequencer(seq);
+
+        curDelayModePublisher.set(curDelayMode_dashboard);
+        curMainModePublisher.set(curMainMode_dashboard);
     
         DrivetrainControl.getInstance().setKnownPose(getStartPose());
         

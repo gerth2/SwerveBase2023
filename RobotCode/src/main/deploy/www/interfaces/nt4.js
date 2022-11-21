@@ -104,7 +104,7 @@ export class NT4_Topic{
     toPropertiesObj(){
         return {
             "name": this.name,
-            "update": this.properties.toUpdateObj(),
+            "update": this.properties,
         }
     }
 
