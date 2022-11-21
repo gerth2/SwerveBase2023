@@ -484,7 +484,7 @@ export class NT4_Client {
                     console.log("Ignoring text message - unknown method " + method);
                     return;
                 }
-            });
+            }, this);
 
         } else {
             //MSGPack
@@ -504,7 +504,7 @@ export class NT4_Client {
                 } else {
                     console.log("Ignoring binary data - invalid topic id " + topicID.toString());
                 }
-            });
+            }, this);
 
         }
     }

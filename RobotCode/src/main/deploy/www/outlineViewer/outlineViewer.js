@@ -39,8 +39,6 @@ function topicAnnounceHandler( newTopic ) {
     valCell.prevValue = "";
     valCell.colorDecayCounter = 0;
 
-    subscribeToAll();
-
 }
 
 function topicUnannounceHandler( removedTopic ) {
@@ -139,7 +137,7 @@ function onConnect() {
     newCell =titleRow.insertCell(3)
     newCell.innerHTML = "<b>Value</b>";
 
-
+    subscribeToAll();
 }
 
 function onDisconnect() {
