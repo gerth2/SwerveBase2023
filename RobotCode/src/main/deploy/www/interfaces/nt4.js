@@ -1,560 +1,542 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NT4_Client = exports.NT4_Topic = void 0;
-/* eslint-disable */
-var msgpack_1 = require("./msgpack");
+import "./msgpack/msgpack.js";
+
 var typestrIdxLookup = {
-    boolean: 0,
-    double: 1,
-    int: 2,
-    float: 3,
-    string: 4,
-    json: 4,
-    raw: 5,
-    rpc: 5,
-    msgpack: 5,
-    protobuf: 5,
-    'boolean[]': 16,
-    'double[]': 17,
-    'int[]': 18,
-    'float[]': 19,
-    'string[]': 20,
-};
-var NT4_Subscription = /** @class */ (function () {
-    function NT4_Subscription() {
-        this.uid = -1;
-        this.topics = new Set();
-        this.options = new NT4_SubscriptionOptions();
+    NT4_TYPESTR: 0,
+    "double": 1,
+    "int": 2,
+    "float": 3,
+    "string": 4,
+    "json": 4,
+    "raw": 5,
+    "rpc": 5,
+    "msgpack": 5,
+    "protobuf": 5,
+    "boolean[]": 16,
+    "double[]": 17,
+    "int[]": 18,
+    "float[]": 19,
+    "string[]": 20
+}
+
+class NT4_TYPESTR{
+    static BOOL = "boolean";
+    static FLOAT_64 = "double";
+    static INT = "int";
+    static FLOAT_32 = "float";
+    static STR = "string";
+    static JSON = "json";
+    static BIN_RAW = "raw";
+    static BIN_RPC = "rpc";
+    static BIN_MSGPACK = "msgpack";
+    static BIN_PROTOBUF = "protobuf";
+    static BOOL_ARR = "boolean[]";
+    static FLOAT_64_ARR = "double[]";
+    static INT_ARR = "int[]";
+    static FLOAT_32_ARR = "float[]";
+    static STR_ARR = "string[]";
+}
+
+export class NT4_ValReq{
+    topics = new Set();
+
+    toGetValsObj(){
+        return {
+            "topics": Array.from(this.topics),
+        };
     }
-    NT4_Subscription.prototype.toSubscribeObj = function () {
+}
+
+export class NT4_Subscription{
+    topics = new Set();
+    options = new NT4_SubscriptionOptions();
+    uid = -1;
+
+    toSubscribeObj(){
         return {
-            topics: Array.from(this.topics),
-            subuid: this.uid,
-            options: this.options.toObj(),
+            "topics": Array.from(this.topics),
+            "options": this.options.toObj(),
+            "subuid": this.uid,
         };
-    };
-    NT4_Subscription.prototype.toUnsubscribeObj = function () {
-        return {
-            subuid: this.uid,
-        };
-    };
-    return NT4_Subscription;
-}());
-var NT4_SubscriptionOptions = /** @class */ (function () {
-    function NT4_SubscriptionOptions() {
-        this.periodic = 0.1;
-        this.all = false;
-        this.topicsOnly = false;
-        this.prefix = false;
     }
-    NT4_SubscriptionOptions.prototype.toObj = function () {
+
+    toUnSubscribeObj(){
         return {
-            periodic: this.periodic,
-            all: this.all,
-            topicsonly: this.topicsOnly,
-            prefix: this.prefix,
+            "subuid": this.uid,
         };
-    };
-    return NT4_SubscriptionOptions;
-}());
-var NT4_Topic = /** @class */ (function () {
-    function NT4_Topic() {
-        this.uid = -1; // "id" if server topic, "pubuid" if published
-        this.name = '';
-        this.type = '';
-        this.properties = {};
     }
-    NT4_Topic.prototype.toPublishObj = function () {
+}
+
+export class NT4_SubscriptionOptions {
+    periodicRate_s = 0.1;
+    all = false;
+    topicsonly = false;
+    prefix = true; //nonstandard default
+
+    toObj(){
         return {
-            name: this.name,
-            type: this.type,
-            pubuid: this.uid,
-            properties: this.properties,
+            "periodic": this.periodicRate_s,
+            "all": this.all,
+            "topicsonly": this.topicsonly,
+            "prefix": this.prefix,
         };
-    };
-    NT4_Topic.prototype.toUnpublishObj = function () {
+    }
+}
+
+export class NT4_Topic{
+    name = "";
+    type = "";
+    id = 0;
+    properties = new NT4_TopicProperties();
+
+    toPublishObj(){
         return {
-            pubuid: this.uid,
-        };
-    };
-    NT4_Topic.prototype.getTypeIdx = function () {
-        if (this.type in typestrIdxLookup) {
-            return typestrIdxLookup[this.type];
+            "name": this.name,
+            "type": this.type,
         }
-        else {
-            return 5; // Default to binary
+    }
+
+    toUnPublishObj(){
+        return {
+            "name": this.name,
         }
-    };
-    return NT4_Topic;
-}());
-exports.NT4_Topic = NT4_Topic;
-var NT4_Client = /** @class */ (function () {
-    /**
-     * Creates a new NT4 client without connecting.
-     * @param serverAddr Network address of NT4 server
-     * @param appName Identifier for this client (does not need to be unique).
-     * @param onTopicAnnounce Gets called when server announces enough topics to form a new signal
-     * @param onTopicUnannounce Gets called when server unannounces any part of a signal
-     * @param onNewTopicData Gets called when any new data is available
-     * @param onConnect Gets called once client completes initial handshake with server
-     * @param onDisconnect Gets called once client detects server has disconnected
-     */
-    function NT4_Client(serverAddr, appName, onTopicAnnounce, onTopicUnannounce, onNewTopicData, onConnect, //
-    onDisconnect) {
-        var _this = this;
-        this.ws = null;
-        this.clientIdx = 0;
-        this.useSecure = false;
-        this.serverAddr = '';
-        this.serverConnectionActive = false;
-        this.serverConnectionRequested = false;
-        this.serverTimeOffset_us = null;
-        this.uidCounter = 0;
+    }
+
+    toPropertiesObj(){
+        return {
+            "name": this.name,
+            "update": this.properties.toUpdateObj(),
+        }
+    }
+
+    getTypeIdx(){
+        return typestrIdxLookup[this.type];
+    }
+}
+
+export class NT4_TopicProperties{
+    isPersistent = false;
+
+    toUpdateObj(){
+        return {
+            "persistent": this.isPersistent,
+        }
+    }
+}
+
+export class NT4_Client {
+
+
+    constructor(serverAddr,
+                onTopicAnnounce_in,    //Gets called when server announces enough topics to form a new signal
+                onTopicUnAnnounce_in,  //Gets called when server unannounces any part of a signal
+                onNewTopicData_in,     //Gets called when any new data is available
+                onConnect_in,          //Gets called once client completes initial handshake with server
+                onDisconnect_in) {     //Gets called once client detects server has disconnected
+
+        this.onTopicAnnounce = onTopicAnnounce_in;
+        this.onTopicUnAnnounce = onTopicUnAnnounce_in;
+        this.onNewTopicData = onNewTopicData_in;
+        this.onConnect = onConnect_in;
+        this.onDisconnect = onDisconnect_in;
+
         this.subscriptions = new Map();
-        this.publishedTopics = new Map();
+        this.subscription_uid_counter = 0;
+
+        this.clientPublishedTopics = new Map();
         this.serverTopics = new Map();
-        this.serverBaseAddr = serverAddr;
-        this.appName = appName;
-        this.onTopicAnnounce = onTopicAnnounce;
-        this.onTopicUnannounce = onTopicUnannounce;
-        this.onNewTopicData = onNewTopicData;
-        this.onConnect = onConnect;
-        this.onDisconnect = onDisconnect;
-        setInterval(function () { return _this.ws_sendTimestamp(); }, 5000);
+
+        this.timeSyncBgEvent = setInterval(this.ws_sendTimestamp.bind(this), 5000);
+
+        // WS Connection State (with defaults)
+        this.serverBaseAddr = serverAddr; 
+        this.clientIdx = 0;
+        this.serverAddr = "";
+        this.serverConnectionActive = false;
+        this.serverTimeOffset_us = 0;
+
+        // Add default time topic
+        var timeTopic = new NT4_Topic();
+        timeTopic.name = "Time";
+        timeTopic.id = -1;
+        timeTopic.type = NT4_TYPESTR.INT; 
+        this.serverTopics.set(timeTopic.id, timeTopic);
     }
+
     //////////////////////////////////////////////////////////////
     // PUBLIC API
-    /** Starts the connection. The client will reconnect automatically when disconnected. */
-    NT4_Client.prototype.connect = function () {
-        if (!this.serverConnectionRequested) {
-            this.serverConnectionRequested = true;
-            this.ws_connect();
-        }
-    };
-    /** Terminates the connection. */
-    NT4_Client.prototype.disconnect = function () {
-        if (this.serverConnectionRequested) {
-            this.serverConnectionRequested = false;
-            if (this.serverConnectionActive && this.ws) {
-                this.ws.close();
-            }
-        }
-    };
-    /**
-     * Add a new subscription, reading data at the specified frequency.
-     * @param topicPatterns A list of topics or prefixes to include in the subscription.
-     * @param prefixMode If true, use patterns as prefixes. If false, only subscribe to topics that are an exact match.
-     * @param period The period to return data in seconds.
-     * @returns A subscription ID that can be used to unsubscribe.
-     */
-    NT4_Client.prototype.subscribePeriodic = function (topicPatterns, prefixMode, period) {
+
+    // Add a new subscription. Returns a subscription object
+    subscribeImmediate(topicPatterns){
         var newSub = new NT4_Subscription();
-        newSub.uid = this.getNewUID();
+        newSub.uid = this.getNewSubUID();
+        newSub.options.immediate = true;
+        newSub.options.periodicRate_s = 0;
         newSub.topics = new Set(topicPatterns);
-        newSub.options.prefix = prefixMode;
-        newSub.options.periodic = period;
+
         this.subscriptions.set(newSub.uid, newSub);
-        if (this.serverConnectionActive) {
+        if(this.serverConnectionActive){
             this.ws_subscribe(newSub);
         }
-        return newSub.uid;
-    };
-    /**
-     * Add a new subscription, reading all value updates.
-     * @param topicPatterns A list of topics or prefixes to include in the subscription.
-     * @param prefixMode If true, use patterns as prefixes. If false, only subscribe to topics that are an exact match.
-     * @returns A subscription ID that can be used to unsubscribe.
-     */
-    NT4_Client.prototype.subscribeAll = function (topicPatterns, prefixMode) {
+        return newSub;
+    }
+
+    // Add a new subscription. Returns a subscription object
+    subscribePeriodic(topicPatterns, period){
         var newSub = new NT4_Subscription();
-        newSub.uid = this.getNewUID();
+        newSub.uid = this.getNewSubUID();
+        newSub.options.immediate = false;
+        newSub.options.periodicRate_s = period;
         newSub.topics = new Set(topicPatterns);
-        newSub.options.prefix = prefixMode;
+        
+        this.subscriptions.set(newSub.uid, newSub);
+        if(this.serverConnectionActive){
+            this.ws_subscribe(newSub);
+        }
+        return newSub;
+    }
+
+    // Add a new subscription. Returns a subscription object
+    subscribeAllSamples(topicPatterns){
+        var newSub = new NT4_Subscription();
+        newSub.uid = this.getNewSubUID();
+        newSub.options.immediate = false;
+        newSub.topics = new Set(topicPatterns);
         newSub.options.all = true;
+
         this.subscriptions.set(newSub.uid, newSub);
-        if (this.serverConnectionActive) {
+        if(this.serverConnectionActive){
             this.ws_subscribe(newSub);
         }
-        return newSub.uid;
-    };
-    /**
-     * Add a new subscription, reading only topic announcements (not values).
-     * @param topicPatterns A list of topics or prefixes to include in the subscription.
-     * @param prefixMode If true, use patterns as prefixes. If false, only subscribe to topics that are an exact match.
-     * @returns A subscription ID that can be used to unsubscribe.
-     */
-    NT4_Client.prototype.subscribeTopicsOnly = function (topicPatterns, prefixMode) {
-        var newSub = new NT4_Subscription();
-        newSub.uid = this.getNewUID();
-        newSub.topics = new Set(topicPatterns);
-        newSub.options.prefix = prefixMode;
-        newSub.options.topicsOnly = true;
-        this.subscriptions.set(newSub.uid, newSub);
-        if (this.serverConnectionActive) {
-            this.ws_subscribe(newSub);
+        return newSub;
+    }
+
+    // Requests latest value of a set of topics
+    getValues(topicPatterns){
+        var newValReq = new NT4_ValReq();
+        newValReq.topics = new Set(topicPatterns);
+        if(this.serverConnectionActive){
+            this.ws_getvalues(newValReq);
         }
-        return newSub.uid;
-    };
-    /** Given an existing subscription, unsubscribe from it. */
-    NT4_Client.prototype.unsubscribe = function (subscriptionId) {
-        var subscription = this.subscriptions.get(subscriptionId);
-        if (!subscription) {
-            throw 'Unknown subscription ID "' + subscriptionId + '"';
+    }
+
+    // Given an existing subscription, unsubscribe from it.
+    unSubscribe(sub){
+        this.subscriptions.delete(sub.uid);
+        if(this.serverConnectionActive){
+            this.ws_unsubscribe(sub);
         }
-        this.subscriptions.delete(subscriptionId);
-        if (this.serverConnectionActive) {
-            this.ws_unsubscribe(subscription);
+    }
+
+    // Unsubscribe from all current subscriptions
+    clearAllSubscriptions(){
+        for(const sub of this.subscriptions.values()){
+            this.unSubscribe(sub);
         }
-    };
-    /** Unsubscribe from all current subscriptions. */
-    NT4_Client.prototype.clearAllSubscriptions = function () {
-        for (var _i = 0, _a = this.subscriptions.keys(); _i < _a.length; _i++) {
-            var subscriptionId = _a[_i];
-            this.unsubscribe(subscriptionId);
+    }
+    
+    // Set the properties of a particular topic
+    setProperties(topic, isPersistent){
+        topic.properties.isPersistent = isPersistent;
+        if(this.serverConnectionActive){
+            this.ws_setproperties(topic);
         }
-    };
-    /**
-     * Set the properties of a particular topic.
-     * @param topic The topic to update
-     * @param properties The set of new properties
-     */
-    NT4_Client.prototype.setProperties = function (topic, properties) {
-        // Update local topics
-        var updateTopic = function (toUpdate) {
-            for (var _i = 0, _a = Object.keys(properties); _i < _a.length; _i++) {
-                var key = _a[_i];
-                var value = properties[key];
-                if (value === null) {
-                    delete toUpdate.properties[key];
-                }
-                else {
-                    toUpdate.properties[key] = value;
-                }
-            }
-        };
-        var publishedTopic = this.publishedTopics.get(topic);
-        if (publishedTopic)
-            updateTopic(publishedTopic);
-        var serverTopic = this.serverTopics.get(topic);
-        if (serverTopic)
-            updateTopic(serverTopic);
-        // Send new properties to server
-        if (this.serverConnectionActive) {
-            this.ws_setproperties(topic, properties);
-        }
-    };
-    /** Set whether a topic is persistent.
-     *
-     * If true, the last set value will be periodically saved to
-     * persistent storage on the server and be restored during server
-     * startup. Topics with this property set to true will not be
-     * deleted by the server when the last publisher stops publishing.
-     */
-    NT4_Client.prototype.setPersistent = function (topic, isPersistent) {
-        this.setProperties(topic, { persistent: isPersistent });
-    };
-    /** Set whether a topic is retained.
-     *
-     * Topics with this property set to true will not be deleted by
-     * the server when the last publisher stops publishing.
-     */
-    NT4_Client.prototype.setRetained = function (topic, isRetained) {
-        this.setProperties(topic, { retained: isRetained });
-    };
-    /** Publish a new topic from this client with the provided name and type. */
-    NT4_Client.prototype.publishNewTopic = function (topic, type) {
-        if (this.publishedTopics.has(topic)) {
-            return;
-        }
-        var newTopic = new NT4_Topic();
-        newTopic.name = topic;
-        newTopic.uid = this.getNewUID();
+    }
+
+    // Publish a new topic from this client with the provided name and type
+    publishNewTopic(name, type){
+        var newTopic = new NT4_Topic()
+        newTopic.name = name;
         newTopic.type = type;
-        this.publishedTopics.set(topic, newTopic);
-        if (this.serverConnectionActive) {
+
+        this.clientPublishedTopics.set(newTopic.name, newTopic);
+        if(this.serverConnectionActive){
             this.ws_publish(newTopic);
         }
-        return;
-    };
-    /** Unpublish a previously-published topic from this client. */
-    NT4_Client.prototype.unpublishTopic = function (topic) {
-        var topicObj = this.publishedTopics.get(topic);
-        if (!topicObj) {
-            throw 'Topic "' + topic + '" not found';
+
+        return newTopic;
+    }
+
+    // UnPublish a previously-published topic from this client.
+    unPublishTopic(oldTopic){
+        this.clientPublishedTopics.delete(oldTopic.name);
+        if(this.serverConnectionActive){
+            this.ws_unpublish(oldTopic);
         }
-        this.publishedTopics.delete(topic);
-        if (this.serverConnectionActive) {
-            this.ws_unpublish(topicObj);
-        }
-    };
-    /** Send some new value to the server. The timestamp is whatever the current time is. */
-    NT4_Client.prototype.addSample = function (topic, value) {
+    }
+
+    // Send some new value to the server
+    // Timestamp is whatever the current time is.
+    addSample(topic, value){
         var timestamp = this.getServerTime_us();
-        if (timestamp === null)
-            timestamp = 0;
-        this.addTimestampedSample(topic, timestamp, value);
-    };
-    /** Send some new timestamped value to the server. */
-    NT4_Client.prototype.addTimestampedSample = function (topic, timestamp, value) {
-        var topicObj = this.publishedTopics.get(topic);
-        if (!topicObj) {
-            throw 'Topic "' + topic + '" not found';
+        this.addSample(topic, timestamp, value);
+    }
+
+    // Send some new timestamped value to the server
+    addSample(topic, timestamp, value){
+
+        if(typeof topic === 'string' ){
+            var topicFound = false;
+            //Slow-lookup - strings are assumed to be topic names for things the server has already announced.
+            for(const topicIter of this.serverTopics.values()){
+                if(topicIter.name === topic){
+                    topic = topicIter;
+                    topicFound = true;
+                    break;
+                }
+            }
+            if(!topicFound){
+                throw "Topic " + topic + " not found in announced server topics!";
+            }
         }
-        var txData = (0, msgpack_1.serialize)([
-            topicObj.uid,
-            timestamp,
-            topicObj.getTypeIdx(),
-            value,
-        ]);
+
+        var msg_part_0 = msgpack.serialize(topic.id, {typeHint:"int"});
+        var msg_part_1 = msgpack.serialize(timestamp, {typeHint:"int"});
+        var msg_part_2 = msgpack.serialize(topic.getTypeIdx(), {typeHint:"int"});
+        var msg_part_3 = msgpack.serialize(value, {typeHint:topic.type});
+        
+        var txData = Uint8Array.from([...msg_part_0, 
+                                      ...msg_part_1,
+                                      ...msg_part_2,
+                                      ...msg_part_3,
+                                    ]);
+
         this.ws_sendBinary(txData);
-    };
+    }
+
     //////////////////////////////////////////////////////////////
     // Server/Client Time Sync Handling
-    /** Returns the current client time in microseconds. */
-    NT4_Client.prototype.getClientTime_us = function () {
-        return new Date().getTime() * 1000;
-    };
-    /** Returns the current server time in microseconds (or null if unknown). */
-    NT4_Client.prototype.getServerTime_us = function () {
-        if (this.serverTimeOffset_us === null) {
-            return null;
+
+    getClientTime_us(){
+        return new Date().getTime()*1000;
+    }
+
+    getServerTime_us(){
+        return this.getClientTime_us() + this.serverTimeOffset_us;
+    }
+
+    ws_sendTimestamp(){
+        var timeTopic = this.serverTopics.get(-1);
+        if(timeTopic){
+            var timeToSend = this.getClientTime_us();
+            this.addSample(timeTopic, 0, timeToSend);
+            console.log("Sending time " + timeToSend/1000000.0);
+            console.log("========================================");
         }
-        else {
-            return this.getClientTime_us() + this.serverTimeOffset_us;
-        }
-    };
-    NT4_Client.prototype.ws_sendTimestamp = function () {
-        var timeToSend = this.getClientTime_us();
-        var txData = (0, msgpack_1.serialize)([-1, 0, typestrIdxLookup['int'], timeToSend]);
-        this.ws_sendBinary(txData);
-    };
-    NT4_Client.prototype.ws_handleReceiveTimestamp = function (serverTimestamp, clientTimestamp) {
+    }
+
+    ws_handleReceiveTimestamp(serverTimestamp, clientTimestamp){
         var rxTime = this.getClientTime_us();
-        // Recalculate server/client offset based on round trip time
+
+        console.log("Got Response from time " + clientTimestamp/1000000.0);
+        console.log("serverTime = " + serverTimestamp/1000000.0);
+
+        //Recalculate server/client offset based on round trip time
         var rtt = rxTime - clientTimestamp;
-        var serverTimeAtRx = serverTimestamp + rtt / 2.0;
+        var serverTimeAtRx = serverTimestamp - rtt/2.0;
         this.serverTimeOffset_us = serverTimeAtRx - rxTime;
-        console.log('[NT4] New server time estimate: ' +
-            (this.getServerTime_us() / 1000000.0).toString());
-    };
+
+        console.log("New server time estimate: " + (this.getServerTime_us()/1000000.0).toString());
+
+
+    }
+
     //////////////////////////////////////////////////////////////
     // Websocket Message Send Handlers
-    NT4_Client.prototype.ws_subscribe = function (subscription) {
-        this.ws_sendJSON('subscribe', subscription.toSubscribeObj());
-    };
-    NT4_Client.prototype.ws_unsubscribe = function (subscription) {
-        this.ws_sendJSON('unsubscribe', subscription.toUnsubscribeObj());
-    };
-    NT4_Client.prototype.ws_publish = function (topic) {
-        this.ws_sendJSON('publish', topic.toPublishObj());
-    };
-    NT4_Client.prototype.ws_unpublish = function (topic) {
-        this.ws_sendJSON('unpublish', topic.toUnpublishObj());
-    };
-    NT4_Client.prototype.ws_setproperties = function (topic, newProperties) {
-        this.ws_sendJSON('setproperties', {
-            name: topic,
-            update: newProperties,
-        });
-    };
-    NT4_Client.prototype.ws_sendJSON = function (method, params) {
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send(JSON.stringify([
-                {
-                    method: method,
-                    params: params,
-                },
-            ]));
+
+    ws_subscribe(sub){
+        this.ws_sendJSON("subscribe", sub.toSubscribeObj());
+    }
+
+    ws_getvalues(gv){
+        this.ws_sendJSON("getvalues", gv.toGetValsObj());
+    }
+
+    ws_unsubscribe(sub){
+        this.ws_sendJSON("unsubscribe", sub.toUnSubscribeObj());
+    }
+
+    ws_publish(topic){
+        this.ws_sendJSON("publish", topic.toPublishObj());
+    }
+
+    ws_unpublish(topic){
+        this.ws_sendJSON("unpublish", topic.toUnPublishObj());
+    }
+
+    ws_setproperties(topic){
+        this.ws_sendJSON("setproperties", topic.toPropertiesObj());
+    }
+
+    ws_sendJSON(method, params){ //Sends a single json message
+        if(this.ws.readyState === WebSocket.OPEN){
+            var txObj = [{
+                "method": method,
+                "params": params
+            }];
+            var txJSON = JSON.stringify(txObj);
+            this.ws.send(txJSON);
         }
-    };
-    NT4_Client.prototype.ws_sendBinary = function (data) {
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+    }
+
+    ws_sendBinary(data){
+        if(this.ws.readyState === WebSocket.OPEN){
             this.ws.send(data);
         }
-    };
+    }
+
     //////////////////////////////////////////////////////////////
     // Websocket connection Maintenance
-    NT4_Client.prototype.ws_onOpen = function () {
+
+    ws_onOpen() {
+        
         // Set the flag allowing general server communication
         this.serverConnectionActive = true;
-        console.log('[NT4] Connected with idx ' + this.clientIdx.toString());
-        // Sync timestamps
-        this.ws_sendTimestamp();
-        // Publish any existing topics
-        for (var _i = 0, _a = this.publishedTopics.values(); _i < _a.length; _i++) {
-            var topic = _a[_i];
+
+        //Publish any existing topics
+        for(const topic of this.clientPublishedTopics.values()){
             this.ws_publish(topic);
+            this.ws_setproperties(topic);
         }
-        // Subscribe to existing subscriptions
-        for (var _b = 0, _c = this.subscriptions.values(); _b < _c.length; _b++) {
-            var subscription = _c[_b];
-            this.ws_subscribe(subscription);
+
+        //Subscribe to existing subscriptions
+        for(const sub of this.subscriptions.values()){
+            this.ws_subscribe(sub);
         }
+
         // User connection-opened hook
         this.onConnect();
-    };
-    NT4_Client.prototype.ws_onClose = function (event) {
-        var _this = this;
-        // Clear flags to stop server communication
+    }
+
+    ws_onClose(e) {
+        //Clear flags to stop server communication
         this.ws = null;
         this.serverConnectionActive = false;
+
         // User connection-closed hook
         this.onDisconnect();
-        // Clear out any local cache of server state
+
+        //Clear out any local cache of server state
         this.serverTopics.clear();
-        if (event.reason !== '') {
-            console.log('[NT4] Socket is closed: ', event.reason);
+
+        console.log('Socket is closed. Reconnect will be attempted in 0.5 second.', e.reason);
+        setTimeout(this.ws_connect.bind(this), 500);
+
+        if(!e.wasClean){
+            console.error('Socket encountered error!');
         }
-        if (!event.wasClean) {
-            this.useSecure = !this.useSecure;
-        }
-        if (this.serverConnectionRequested) {
-            setTimeout(function () { return _this.ws_connect(); }, 500);
-        }
-    };
-    NT4_Client.prototype.ws_onError = function () {
-        if (this.ws)
-            this.ws.close();
-    };
-    NT4_Client.prototype.ws_onMessage = function (event) {
-        var _this = this;
-        if (typeof event.data === 'string') {
-            // JSON array
-            var msgData = JSON.parse(event.data);
-            if (!Array.isArray(msgData)) {
-                console.warn('[NT4] Ignoring text message, JSON parsing did not produce an array at the top level.');
-                return;
-            }
-            msgData.forEach(function (msg) {
-                // Validate proper format of message
-                if (typeof msg !== 'object') {
-                    console.warn('[NT4] Ignoring text message, JSON parsing did not produce an object.');
+
+    }
+
+    ws_onError(e){
+        this.ws.close();
+    }
+
+    ws_onMessage(e){
+        if(typeof e.data === 'string'){
+            //JSON Message
+            var rxArray = JSON.parse(e.data); 
+
+            rxArray.forEach(function(msg) { 
+
+                //Validate proper format of message
+                if(typeof msg !== 'object'){
+                    console.log("Ignoring text message, JSON parsing did not produce an object.");
                     return;
                 }
-                if (!('method' in msg) || !('params' in msg)) {
-                    console.warn('[NT4] Ignoring text message, JSON parsing did not find all required fields.');
+                    
+                if( !("method" in msg) || !("params" in msg)){
+                    console.log("Ignoring text message, JSON parsing did not find all required fields."); 
                     return;
                 }
-                var method = msg['method'];
-                var params = msg['params'];
-                if (typeof method !== 'string') {
-                    console.warn('[NT4] Ignoring text message, JSON parsing found "method", but it wasn\'t a string.');
+
+                var method = msg["method"];
+                var params = msg["params"];
+                
+                if(typeof method !== 'string'){
+                    console.log("Ignoring text message, JSON parsing found \"method\", but it wasn't a string.");
                     return;
                 }
-                if (typeof params !== 'object') {
-                    console.warn('[NT4] Ignoring text message, JSON parsing found "params", but it wasn\'t an object.');
+                            
+                if(typeof params !== 'object'){
+                    console.log("Ignoring text message, JSON parsing found \"params\", but it wasn't an object.");
                     return;
                 }
+
                 // Message validates reasonably, switch based on supported methods
-                if (method === 'announce') {
+                if(method === "announce"){
                     var newTopic = new NT4_Topic();
-                    newTopic.uid = params.id;
                     newTopic.name = params.name;
+                    newTopic.id = params.id;
                     newTopic.type = params.type;
-                    newTopic.properties = params.properties;
-                    _this.serverTopics.set(newTopic.name, newTopic);
-                    _this.onTopicAnnounce(newTopic);
-                }
-                else if (method === 'unannounce') {
-                    var removedTopic = _this.serverTopics.get(params.name);
-                    if (!removedTopic) {
-                        console.warn('[NT4] Ignoring unannounce, topic was not previously announced.');
+                    newTopic.properties.isPersistent = params.properties.persistent;
+                    this.serverTopics.set(newTopic.id, newTopic);
+                    this.onTopicAnnounce(newTopic);
+                } else if (method === "unannounce"){
+                    var removedTopic = this.serverTopics.get(params.id);
+                    if(!removedTopic){
+                        console.log("Ignorining unannounce, topic was not previously announced.");
                         return;
                     }
-                    _this.serverTopics.delete(removedTopic.name);
-                    _this.onTopicUnannounce(removedTopic);
-                }
-                else if (method === 'properties') {
-                    var topic = _this.serverTopics.get(params.name);
-                    if (!topic) {
-                        console.warn('[NT4] Ignoring set properties, topic was not previously announced.');
-                        return;
-                    }
-                    for (var _i = 0, _a = Object.keys(params.update); _i < _a.length; _i++) {
-                        var key = _a[_i];
-                        var value = params.update[key];
-                        if (value === null) {
-                            delete topic.properties[key];
-                        }
-                        else {
-                            topic.properties[key] = value;
-                        }
-                    }
-                }
-                else {
-                    console.warn('[NT4] Ignoring text message - unknown method ' + method);
+                    this.serverTopics.delete(removedTopic.id);
+                    this.onTopicUnAnnounce(removedTopic);
+
+                } else {
+                    console.log("Ignoring text message - unknown method " + method);
                     return;
                 }
             });
-        }
-        else {
-            // MSGPack
-            (0, msgpack_1.deserialize)(event.data, { multiple: true }).forEach(function (unpackedData) {
+
+        } else {
+            //MSGPack
+            var rxArray = msgpack.deserialize(e.data, {multiple:true});
+
+            rxArray.forEach(function(unpackedData) { //For every value update...
                 var topicID = unpackedData[0];
                 var timestamp_us = unpackedData[1];
-                // let typeIdx = unpackedData[2];
-                var value = unpackedData[3];
-                if (topicID >= 0) {
-                    var topic = null;
-                    for (var _i = 0, _a = _this.serverTopics.values(); _i < _a.length; _i++) {
-                        var serverTopic = _a[_i];
-                        if (serverTopic.uid === topicID) {
-                            topic = serverTopic;
-                            // return;
-                        }
-                    }
-                    if (!topic) {
-                        console.warn('[NT4] Ignoring binary data - unknown topic ID ' +
-                            topicID.toString());
-                        return;
-                    }
-                    _this.onNewTopicData(topic, timestamp_us, value);
-                }
-                else if (topicID === -1) {
-                    _this.ws_handleReceiveTimestamp(timestamp_us, value);
-                }
-                else {
-                    console.warn('[NT4] Ignoring binary data - invalid topic ID ' +
-                        topicID.toString());
+                var typeIdx = unpackedData[2];
+                var value   = unpackedData[3];
+
+                if(topicID >= 0){
+                    var topic = this.serverTopics.get(topicID);
+                    this.onNewTopicData(topic, timestamp_us, value);
+                } else if (topicID === -1){
+                    this.ws_handleReceiveTimestamp(timestamp_us, value);
+                } else {
+                    console.log("Ignoring binary data - invalid topic id " + topicID.toString());
                 }
             });
+
         }
-    };
-    NT4_Client.prototype.ws_connect = function () {
-        var _this = this;
-        this.clientIdx = Math.floor(Math.random() * 99999999);
-        var port = 5810;
-        var prefix = 'ws://';
-        if (this.useSecure) {
-            prefix = 'wss://';
-            port = 5811;
-        }
-        this.serverAddr =
-            prefix +
-                this.serverBaseAddr +
-                ':' +
-                port.toString() +
-                '/nt/' +
-                this.appName +
-                '_' +
-                this.clientIdx.toString();
-        this.ws = new WebSocket(this.serverAddr, 'networktables.first.wpi.edu');
-        this.ws.binaryType = 'arraybuffer';
-        this.ws.addEventListener('open', function () { return _this.ws_onOpen(); });
-        this.ws.addEventListener('message', function (event) {
-            return _this.ws_onMessage(event);
-        });
-        this.ws.addEventListener('close', function (event) {
-            return _this.ws_onClose(event);
-        });
-        this.ws.addEventListener('error', function () { return _this.ws_onError(); });
-    };
+    }
+
+    ws_connect() {
+
+        this.clientIdx = Math.floor(Math.random() * 99999999); //Not great, but using it for now
+
+        var port = 5810; //fallback - unsecured
+        var prefix = "ws://";
+
+        this.serverAddr = prefix + this.serverBaseAddr + ":" + port.toString() + "/nt/" + "CasseroleWS2_" + this.clientIdx.toString();
+
+        this.ws = new WebSocket(this.serverAddr, "networktables.first.wpi.edu");
+        this.ws.binaryType = "arraybuffer";
+        this.ws.onopen = this.ws_onOpen.bind(this);
+        this.ws.onmessage = this.ws_onMessage.bind(this);
+        this.ws.onclose = this.ws_onClose.bind(this);
+        this.ws.onerror = this.ws_onError.bind(this);
+
+        console.log("Connected with idx " + this.clientIdx.toString());
+    }
+    
+
+
     //////////////////////////////////////////////////////////////
     // General utilties
-    NT4_Client.prototype.getNewUID = function () {
-        this.uidCounter++;
-        return this.uidCounter + this.clientIdx;
-    };
-    return NT4_Client;
-}());
-exports.NT4_Client = NT4_Client;
+    
+    getNewSubUID(){
+        this.subscription_uid_counter++;
+        return this.subscription_uid_counter + this.clientIdx;
+    }
+
+
+}
