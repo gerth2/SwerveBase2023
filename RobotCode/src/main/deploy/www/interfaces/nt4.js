@@ -263,16 +263,19 @@ export class NT4_Client {
             }
         }
 
-        var msg_part_0 = msgpack.serialize(topic.id, {typeHint:"int"});
-        var msg_part_1 = msgpack.serialize(timestamp, {typeHint:"int"});
-        var msg_part_2 = msgpack.serialize(topic.getTypeIdx(), {typeHint:"int"});
-        var msg_part_3 = msgpack.serialize(value, {typeHint:topic.type});
-        
-        var txData = Uint8Array.from([...msg_part_0, 
-                                      ...msg_part_1,
-                                      ...msg_part_2,
-                                      ...msg_part_3,
-                                    ]);
+        var sourceData = [topic.id, timestamp, topic.getTypeIdx(), value];
+        var txData = msgpack.serialize(sourceData);
+
+        //var msg_part_0 = msgpack.serialize(topic.id, {typeHint:"int"});
+        //var msg_part_1 = msgpack.serialize(timestamp, {typeHint:"int"});
+        //var msg_part_2 = msgpack.serialize(topic.getTypeIdx(), {typeHint:"int"});
+        //var msg_part_3 = msgpack.serialize(value, {typeHint:topic.type});
+        //
+        //var txData = Uint8Array.from([...msg_part_0, 
+        //                              ...msg_part_1,
+        //                              ...msg_part_2,
+        //                              ...msg_part_3,
+        //                            ]);
 
         this.ws_sendBinary(txData);
     }
