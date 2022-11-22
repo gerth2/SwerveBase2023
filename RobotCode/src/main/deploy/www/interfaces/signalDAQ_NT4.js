@@ -48,25 +48,23 @@ export class SignalDAQNT4 {
     }
 
     topicAnnounceHandler( newTopic ) {
-        if(this.isSignalUnitsTopic(newTopic)){
+        if(this.isSignalValueTopic(newTopic)){
             //If a signal units topic is announced, request what those units value actually is.
-            this.nt4Client.subscribeAllSamples([newTopic.name]);
+            var sigName = this.valueTopicToSigName(newTopic);
+            var sigUnits = newTopic.properties.units;    
+            this.onSignalAnnounce(sigName, sigUnits); //Announce signal when we know the value of its units
+    
         }
     }
 
     topicUnannounceHandler( removedTopic ) {
-        if(this.isSignalUnitsTopic(removedTopic)){
-            this.onSignalUnAnnounce(this.unitsTopicToSigName(removedTopic));
+        if(this.isSignalValueTopic(removedTopic)){
+            this.onSignalUnAnnounce(this.valueTopicToSigName(removedTopic));
         } 
     }
 
     valueUpdateHandler(topic, timestamp, value){
-        if(this.isSignalUnitsTopic(topic)){
-            // Got new value for the units of a signal
-            var sigName = this.unitsTopicToSigName(topic);
-            var sigUnits = value;
-            this.onSignalAnnounce(sigName, sigUnits); //Announce signal when we know the value of its units
-        } else {
+        if(this.isSignalValueTopic(topic)){
             // Got a new sample
             var sigName = this.valueTopicToSigName(topic);
             this.onNewSampleData(sigName, timestamp, value);
@@ -132,21 +130,6 @@ export class SignalDAQNT4 {
 
     isSignalValueTopic(topic){
         return topic.match(/Signals\/[a-zA-Z0-9\._]+\/value/);
-    }
-
-    sigNameToUnitsTopic(name){
-        return "/Signals/" + name + "/units"
-    }
-
-    unitsTopicToSigName(topic){
-        var tmp = topic.name;
-        tmp = tmp.replace(/^\/Signals\//, '');
-        tmp = tmp.replace(/\/units/, '');
-        return tmp;
-    }
-
-    isSignalUnitsTopic(topic){
-        return topic.name.match(/^\/Signals\/[a-zA-Z0-9\._]+\/units/);
     }
 
     isSignalValueTopic(topic){

@@ -4,8 +4,7 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.PubSubOption;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.networktables.StringTopic;
+
 
 
 public class Signal {
@@ -14,8 +13,7 @@ public class Signal {
     String units;
     DoubleTopic nt4ValTopic;
     DoublePublisher nt4ValPublisher;
-    StringTopic nt4UnitsTopic;
-    StringPublisher nt4UnitsPublisher;
+
     /**
      * Class which describes one line on a plot
      * 
@@ -30,15 +28,14 @@ public class Signal {
 
 
         nt4ValTopic   = inst.getDoubleTopic(this.getNT4ValueTopicName());
-        nt4UnitsTopic   = inst.getStringTopic(this.getNT4UnitsTopicName());
 
 
         //The goal of a signal is to record the value of a variable every loop, for debugging down to loop-to-loop changes
         // Therefor we do want to send all vlaues over the network, and we do want to keep any duplicates.
         nt4ValPublisher = nt4ValTopic.publish(PubSubOption.sendAll(true), PubSubOption.keepDuplicates(true));
-        nt4UnitsPublisher = nt4UnitsTopic.publish();
 
-        nt4UnitsPublisher.setDefault(units);
+        nt4ValTopic.setProperties("{ \"units\" : \"" + units + "\"}");
+
 
         SignalWrangler.getInstance().register(this);
     }
