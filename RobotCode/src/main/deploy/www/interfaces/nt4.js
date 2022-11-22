@@ -144,12 +144,7 @@ export class NT4_Client {
         this.serverConnectionActive = false;
         this.serverTimeOffset_us = 0;
 
-        // Add default time topic
-        var timeTopic = new NT4_Topic();
-        timeTopic.name = "Time";
-        timeTopic.id = -1;
-        timeTopic.type = NT4_TYPESTR.INT; 
-        this.serverTopics.set(timeTopic.id, timeTopic);
+
     }
 
     //////////////////////////////////////////////////////////////
@@ -363,6 +358,13 @@ export class NT4_Client {
     // Websocket connection Maintenance
 
     ws_onOpen() {
+
+        // Add default time topic
+        var timeTopic = new NT4_Topic();
+        timeTopic.name = "Time";
+        timeTopic.id = -1;
+        timeTopic.type = NT4_TYPESTR.INT; 
+        this.serverTopics.set(timeTopic.id, timeTopic);
         
         // Set the flag allowing general server communication
         this.serverConnectionActive = true;
