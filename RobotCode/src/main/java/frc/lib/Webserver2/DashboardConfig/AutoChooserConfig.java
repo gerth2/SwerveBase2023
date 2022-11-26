@@ -65,4 +65,12 @@ public class AutoChooserConfig extends VisibleWidgetConfig {
 
     }
 
+    @Override
+    public String getTopicSubscriptionStrings(){
+        String retStr = "";
+        retStr += "\"" + nt4TopicDesVal + "\",";
+        retStr += "\"" + nt4TopicCurVal + "\",";
+        return retStr;
+    }
+
 }

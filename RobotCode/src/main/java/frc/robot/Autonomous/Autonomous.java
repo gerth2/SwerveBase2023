@@ -45,11 +45,14 @@ public class Autonomous {
     IntegerTopic curMainModeTopic;
     IntegerPublisher curDelayModePublisher;
     IntegerPublisher curMainModePublisher;
-    IntegerSubscriber curDelayModeSubscriber;
-    IntegerSubscriber curMainModeSubscriber;
 
-    long curDelayMode_dashboard = 0;
-    long curMainMode_dashboard = 0;
+    IntegerTopic desDelayModeTopic;
+    IntegerTopic desMainModeTopic;
+    IntegerSubscriber desDelayModeSubscriber;
+    IntegerSubscriber desMainModeSubscriber;
+
+    long desDelayMode = 0;
+    long desMainMode = 0;
 
     public AutoModeList mainModeList = new AutoModeList("main");
     public AutoModeList delayModeList = new AutoModeList("delay");
@@ -92,8 +95,11 @@ public class Autonomous {
         curDelayModeTopic = inst.getIntegerTopic(delayModeList.getCurModeTopicName());
         curMainModeTopic  = inst.getIntegerTopic(mainModeList.getCurModeTopicName());
 
-        curDelayModeSubscriber = curDelayModeTopic.subscribe(0);
-        curMainModeSubscriber = curMainModeTopic.subscribe(0);
+        desDelayModeTopic = inst.getIntegerTopic(delayModeList.getDesModeTopicName());
+        desMainModeTopic  = inst.getIntegerTopic(mainModeList.getDesModeTopicName());
+
+        desDelayModeSubscriber = desDelayModeTopic.subscribe(0);
+        desMainModeSubscriber  = desMainModeTopic.subscribe(0);
 
         curDelayModePublisher = curDelayModeTopic.publish();
         curMainModePublisher = curMainModeTopic.publish();
@@ -107,8 +113,10 @@ public class Autonomous {
 
     /* This should be called periodically in Disabled, and once in auto init */
     public void sampleDashboardSelector(){
-        curDelayMode = delayModeList.get((int)curDelayMode_dashboard);
-        curMainMode = mainModeList.get((int)curMainMode_dashboard);	
+        desDelayMode = desDelayModeSubscriber.get();
+        desMainMode  = desMainModeSubscriber.get();
+        curDelayMode = delayModeList.get((int)desDelayMode);
+        curMainMode = mainModeList.get((int)desMainMode);	
         if(curDelayMode != prevDelayMode || curMainMode != prevMainMode){
             loadSequencer();
             prevDelayMode = curDelayMode;
@@ -139,8 +147,8 @@ public class Autonomous {
         curDelayMode.addStepsToSequencer(seq);
         curMainMode.addStepsToSequencer(seq);
 
-        curDelayModePublisher.set(curDelayMode_dashboard);
-        curMainModePublisher.set(curMainMode_dashboard);
+        curDelayModePublisher.set(desDelayMode);
+        curMainModePublisher.set(desMainMode);
     
         DrivetrainControl.getInstance().setKnownPose(getStartPose());
         
@@ -149,8 +157,7 @@ public class Autonomous {
 
     /* This should be called periodically, always */
     public void update(){
-        curDelayMode_dashboard = curDelayModeSubscriber.get();
-        curMainMode_dashboard  = curMainModeSubscriber.get();
+
         seq.update();
     }
 
@@ -167,5 +174,6 @@ public class Autonomous {
     public Pose2d getStartPose(){
         return curMainMode.getInitialPose();
     }
+
 
 }

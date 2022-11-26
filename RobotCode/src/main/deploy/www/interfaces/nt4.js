@@ -85,13 +85,14 @@ export class NT4_SubscriptionOptions {
 export class NT4_Topic{
     name = "";
     type = "";
-    id = 0;
+    id = Math.floor(Math.random() * 99999999); //For topics that the server doesnt' provide us with the ID, generate one
     properties = {}; //Properties are free-form, might have anything in them
 
     toPublishObj(){
         return {
             "name": this.name,
             "type": this.type,
+            "pubuid": this.id,
         }
     }
 
@@ -446,7 +447,11 @@ export class NT4_Client {
                 if(method === "announce"){
                     var newTopic = new NT4_Topic();
                     newTopic.name = params.name;
-                    newTopic.id = params.id;
+                    if(params.pubuid != null){
+                        newTopic.id = params.pubuid; //Case, we had a pubid, so use this for the ID
+                    } else {
+                        newTopic.id = params.id; // Case, just use the id
+                    }
                     newTopic.type = params.type;
                     newTopic.properties = params.properties;
                     this.serverTopics.set(newTopic.id, newTopic);
