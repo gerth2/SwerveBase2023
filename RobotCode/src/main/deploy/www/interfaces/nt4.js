@@ -294,24 +294,16 @@ export class NT4_Client {
         if (timeTopic) {
             var timeToSend = this.getClientTime_us();
             this.addSample(timeTopic, 0, timeToSend);
-            //console.log("[NT4] Sending time " + timeToSend/1000000.0);
-            //console.log("[NT4] ========================================");
         }
     }
 
     ws_handleReceiveTimestamp(serverTimestamp, clientTimestamp) {
         var rxTime = this.getClientTime_us();
 
-        //console.log("[NT4] Got Response from time " + clientTimestamp/1000000.0);
-        //console.log("[NT4] serverTime = " + serverTimestamp/1000000.0);
-
         //Recalculate server/client offset based on round trip time
         var rtt = rxTime - clientTimestamp;
         var serverTimeAtRx = serverTimestamp - rtt / 2.0;
         this.serverTimeOffset_us = serverTimeAtRx - rxTime;
-
-        //console.log("[NT4] New server time estimate: " + (this.getServerTime_us()/1000000.0).toString());
-
 
     }
 

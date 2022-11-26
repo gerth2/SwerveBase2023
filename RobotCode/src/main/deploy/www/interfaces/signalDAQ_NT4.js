@@ -29,6 +29,8 @@ export class SignalDAQNT4 {
 
         this.rxCount = 0;
 
+        this.timeOffset = 0;
+
         this.nt4Client = new NT4_Client(window.location.hostname, 
                                         this.topicAnnounceHandler.bind(this), 
                                         this.topicUnannounceHandler.bind(this),
@@ -67,7 +69,7 @@ export class SignalDAQNT4 {
         if(this.isSignalValueTopic(topic)){
             // Got a new sample
             var sigName = this.valueTopicToSigName(topic);
-            this.onNewSampleData(sigName, timestamp, value);
+            this.onNewSampleData(sigName, timestamp - this.timeOffset, value);
             if(this.daqRunning){
                 this.rxCount++;
             }
@@ -96,6 +98,7 @@ export class SignalDAQNT4 {
             this.nt4Client.subscribeAllSamples([this.sigNameToValueTopic(sigName)]);
         });
         this.rxCount = 0;
+        this.timeOffset = this.nt4Client.getServerTime_us();
         this.updateStatusText();
     }
 

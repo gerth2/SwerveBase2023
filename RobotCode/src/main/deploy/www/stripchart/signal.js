@@ -71,24 +71,30 @@ export class Signal {
     getIndexOfTime(time_in){
         var len = this.sampleList.length;
 
-        if(time_in <= this.firstSampleTime){
-            return 0; //Edge case - user asks for sample before known time
-        } else if (time_in >= this.latestSampleTime){
-            return this.sampleList.length - 1; //Edge case - user asks for sample after known range
+        if(len == 0){
+            return null; // no samples. Return null
+        } else if (len == 1) {
+            return 0; // only one sample, return it.
+        } else if(time_in <= this.firstSampleTime){
+            return 0; //User asks for sample before known time. Return first sample
+        } else if(time_in >= this.latestSampleTime){
+            return len-1; //User asks for a future asmple. Return the latest.
         } else {
-            if(len >= 3){
+      
+            //Main algorithm - assume the points are roughly equally spaced and start guessing about where
+            // we'd expect the requested point to be.
+            var signalTimeSpan = this.latestSampleTime - this.firstSampleTime;
+            if(signalTimeSpan > 0){
+                var guessIdx = Math.floor( (this.sampleList.length-1) * (time_in-this.firstSampleTime) / (signalTimeSpan));
 
-                //Main algorithm - assume the points are roughly equally spaced and start guessing about where
-                // we'd expect the requested point to be.
-                var signalTimeSpan = this.latestSampleTime - this.firstSampleTime;
-                if(signalTimeSpan > 0){
-                    var guessIdx = Math.floor( (this.sampleList.length-1) * (time_in-this.firstSampleTime) / (signalTimeSpan));
+                while(true){ //return statements expected to kick out out of this loop.
+                    var guessTime = this.sampleList[guessIdx].time;
 
-                    while(true){ //return statements expected to kick out out of this loop.
-                        var guessTime = this.sampleList[guessIdx].time;
-
-                        if(guessTime > time_in){
-                            //Guessed too high, look backward in list
+                    if(guessTime > time_in){
+                        //Guessed too high, look backward in list
+                        if(guessIdx <= 0){
+                            return 0; // nowhere to look backwrd, just return first element
+                        } else {
                             var guessTimeNext = this.sampleList[guessIdx-1].time;
                             if(guessTimeNext < time_in){
                                 //We found the right interval, return the upper bound.
@@ -98,9 +104,14 @@ export class Signal {
                                 guessIdx = guessIdx - 1;
                                 continue;
                             }
+                        }
 
-                        } else if (guessTime < time_in){
-                            //Guessed too low, move forward in list
+
+                    } else if (guessTime < time_in){
+                        //Guessed too low, move forward in list
+                        if(guessIdx >= len-1){
+                            return len-1;//Nowhere to move forward, just return last element
+                        } else {
                             var guessTimeNext = this.sampleList[guessIdx+1].time;
                             if(guessTimeNext > time_in){
                                 //We found the right interval, return the upper bound.
@@ -110,22 +121,19 @@ export class Signal {
                                 guessIdx = guessIdx + 1;
                                 continue;
                             }
-
-                        } else {
-                            //hot dog got it spot on!
-                            return guessIdx;
                         }
+
+                    } else {
+                        //hot dog got it spot on!
+                        return guessIdx;
                     }
-
-
-                } else {
-                    return len-1; //Edge case - samples provided are all on the same timestamp - just return the most recently submitted one
                 }
-            } else if (len == 1 || len == 2){
-                return len-1; //Edge Case - only one or two samples in the list. Above algorithm won't work well, so just return latest sample
-            } else if(len == 0) {
-                return null; //Edge case - no samples in list - return null
+
+
+            } else {
+                return len-1; //Edge case - samples provided are all on the same timestamp - just return the most recently submitted one
             }
+
 
         }
 

@@ -258,7 +258,7 @@ function onSignalUnAnnounce(name){
 
 function onNewSampleData(name, timestamp, value){
     if(allSignalsMap.has(name)){
-        var sampleTimeSec = timestamp/1000000.0;
+        var sampleTimeSec = timestamp/1000000.0; //microseconds to floating point seconds
         allSignalsMap.get(name).addSample(new Sample(sampleTimeSec, value));
 
         //Save off incoming sample timing stats

@@ -98,7 +98,7 @@ export class FastChart {
             this.ctx.font = "18px monospace";
             this.ctx.textBaseline = 'top';
             this.ctx.fillStyle = "#FFFFFF";
-            this.ctx.fillText(markerTime.toPrecision(3), xPos + 2, this.plotOriginY_px + 2);
+            this.ctx.fillText(markerTime.toFixed(2), xPos + 2, this.plotOriginY_px + 2);
         });
 
     }
