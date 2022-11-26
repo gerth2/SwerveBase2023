@@ -56,11 +56,22 @@ function onCalValueChange(cal){
     calTilesMap.get(cal.name).updateDisplayedValues();
 }
 
+function addHeaders(){
+    var rowTitles = ["Name", "Units", "Min", "Max", "Default", "Current", "Controls"];
+    for(var rowTitle of rowTitles){
+        var newth = document.createElement("th");
+        newth.innerHTML = rowTitle;
+        mainTable.appendChild(newth);
+    }
+}
+
 function clearAll(){
     calTilesMap.clear();
     for(var child of mainTable.children){
         mainTable.removeChild(child);
     }
+
+    addHeaders();
 }
 
 function onConnect(){

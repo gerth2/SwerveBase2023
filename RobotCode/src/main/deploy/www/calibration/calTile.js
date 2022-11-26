@@ -112,6 +112,9 @@ export class CalTile {
         var new_td = document.createElement("td");
         new_td.appendChild(buttonDiv);
         this.drawDiv.appendChild(new_td);
+
+        buttonDiv.style.padding = "5px";
+        
         return new_td;
     }
 

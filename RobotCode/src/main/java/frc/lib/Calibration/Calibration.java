@@ -202,7 +202,7 @@ public class Calibration {
         calCurValueTopic.setProperties("{ \"units\" : \"" + this.units + "\"}");
         calCurValueTopic.setProperties("{ \"min_cal\" : \"" + this.min_cal + "\"}");
         calCurValueTopic.setProperties("{ \"max_cal\" : \"" + this.max_cal + "\"}");
-        calCurValueTopic.setProperties("{ \"default_val\" : \"" + this.default_val + "\"}");
+        calCurValueTopic.setProperties("{ \"default_val\" : " + Double.toString(this.default_val) + "}");
         calCurValuePublisher.setDefault(this.cur_val);
 
         calDesValueTopic = inst.getDoubleTopic(this.getDesValueTopic());
