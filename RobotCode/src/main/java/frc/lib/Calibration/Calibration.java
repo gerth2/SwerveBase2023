@@ -4,10 +4,8 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.PubSubOption;
-import edu.wpi.first.networktables.StringPublisher;
-import edu.wpi.first.networktables.StringTopic;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 
 
 /*
@@ -76,9 +74,11 @@ public class Calibration {
     public double min_cal;
 
 
-    DoubleTopic calValueTopic;
-    DoublePublisher calValuePublisher;
-    DoubleSubscriber calValueSubscriber;
+    DoubleTopic calCurValueTopic;
+    DoublePublisher calCurValuePublisher;
+
+    DoubleTopic calDesValueTopic;
+    DoubleSubscriber calDesValueSubscriber;
 
     /**
      * Constructor for a new calibratable value.
@@ -196,20 +196,17 @@ public class Calibration {
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
-        calValueTopic   = inst.getDoubleTopic(this.getValueTopic());
+        calCurValueTopic     = inst.getDoubleTopic(this.getCurValueTopic());
 
-        calValuePublisher   = calValueTopic.publish();
+        calCurValuePublisher = calCurValueTopic.publish(); //Must publish before setting properties
+        calCurValueTopic.setProperties("{ \"units\" : \"" + this.units + "\"}");
+        calCurValueTopic.setProperties("{ \"min_cal\" : \"" + this.min_cal + "\"}");
+        calCurValueTopic.setProperties("{ \"max_cal\" : \"" + this.max_cal + "\"}");
+        calCurValueTopic.setProperties("{ \"default_val\" : \"" + this.default_val + "\"}");
+        calCurValuePublisher.setDefault(this.cur_val);
 
-        calValuePublisher.setDefault(this.cur_val);
-
-        calValueTopic.setProperties("{ \"units\" : \"" + this.units + "\"}");
-        calValueTopic.setProperties("{ \"min_cal\" : \"" + this.min_cal + "\"}");
-        calValueTopic.setProperties("{ \"max_cal\" : \"" + this.max_cal + "\"}");
-        calValueTopic.setProperties("{ \"default_val\" : \"" + this.default_val + "\"}");
-
-
-
-        calValueSubscriber = calValueTopic.subscribe(this.cur_val);
+        calDesValueTopic = inst.getDoubleTopic(this.getDesValueTopic());
+        calDesValueSubscriber = calDesValueTopic.subscribe(this.cur_val);
 
         CalWrangler.getInstance().register(this);
 
@@ -309,13 +306,14 @@ public class Calibration {
      * @param val_in Value to set.
      */
     public void update() {
-        var val_in = calValueSubscriber.get();
-        double temp = limitRange(val_in);
-        if(temp != cur_val){
-            cur_val = temp;
+        var val_in = calDesValueSubscriber.get();
+        double val_in_limited = limitRange(val_in);
+        if(val_in_limited != cur_val){
+            cur_val = val_in_limited;
             overridden = true;
             is_updated = true;
             System.out.println("Info: Calibration " + this.name + " set to " + Double.toString(cur_val));
+            calCurValuePublisher.set(val_in_limited, Math.round(Timer.getFPGATimestamp()*1000000l));
         }
     }
 
@@ -326,13 +324,8 @@ public class Calibration {
         overridden = false;
         cur_val = default_val;
     }
-
     
-    String getValueTopic(){   return "/Calibrations/"+this.name+"/Value"; }
-    String getDefaultTopic(){ return "/Calibrations/"+this.name+"/Default"; }
-    String getUnitsTopic(){   return "/Calibrations/"+this.name+"/Units"; }
-    String getMinTopic(){     return "/Calibrations/"+this.name+"/Min"; }
-    String getMaxTopic(){     return "/Calibrations/"+this.name+"/Max"; }
-
+    String getCurValueTopic(){   return "/Calibrations/"+this.name+"/curValue"; }
+    String getDesValueTopic(){   return "/Calibrations/"+this.name+"/desValue"; }
 
 }

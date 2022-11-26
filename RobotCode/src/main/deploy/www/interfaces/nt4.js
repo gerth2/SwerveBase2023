@@ -85,20 +85,22 @@ export class NT4_SubscriptionOptions {
 export class NT4_Topic{
     name = "";
     type = "";
-    id = Math.floor(Math.random() * 99999999); //For topics that the server doesnt' provide us with the ID, generate one
+    id = 0;
+    pubuid = 0;
     properties = {}; //Properties are free-form, might have anything in them
 
     toPublishObj(){
         return {
             "name": this.name,
             "type": this.type,
-            "pubuid": this.id,
+            "pubuid": this.pubuid,
         }
     }
 
     toUnPublishObj(){
         return {
             "name": this.name,
+            "pubuid": this.pubuid,
         }
     }
 
@@ -132,6 +134,7 @@ export class NT4_Client {
 
         this.subscriptions = new Map();
         this.subscription_uid_counter = 0;
+        this.publish_uid_counter = 0;
 
         this.clientPublishedTopics = new Map();
         this.serverTopics = new Map();
@@ -210,8 +213,9 @@ export class NT4_Client {
     }
     
     // Set the properties of a particular topic
-    setProperties(topic, isPersistent){
-        topic.properties.isPersistent = isPersistent;
+    setProperties(topic, isPersistent, isRetained){
+        topic.properties.persistent = isPersistent;
+        topic.properties.retained = isRetained;
         if(this.serverConnectionActive){
             this.ws_setproperties(topic);
         }
@@ -219,16 +223,20 @@ export class NT4_Client {
 
     // Publish a new topic from this client with the provided name and type
     publishNewTopic(name, type){
-        var newTopic = new NT4_Topic()
+        var newTopic = new NT4_Topic();
         newTopic.name = name;
         newTopic.type = type;
-
-        this.clientPublishedTopics.set(newTopic.name, newTopic);
-        if(this.serverConnectionActive){
-            this.ws_publish(newTopic);
-        }
-
+        this.publishTopic(newTopic);
         return newTopic;
+    }
+
+    // Publish an existing topic to the server
+    publishTopic(topic){
+        topic.pubuid = this.getNewPubUID();
+        this.clientPublishedTopics.set(topic.name, topic);
+        if(this.serverConnectionActive){
+            this.ws_publish(topic);
+        }
     }
 
     // UnPublish a previously-published topic from this client.
@@ -264,19 +272,8 @@ export class NT4_Client {
             }
         }
 
-        var sourceData = [topic.id, timestamp, topic.getTypeIdx(), value];
+        var sourceData = [topic.pubuid, timestamp, topic.getTypeIdx(), value];
         var txData = msgpack.serialize(sourceData);
-
-        //var msg_part_0 = msgpack.serialize(topic.id, {typeHint:"int"});
-        //var msg_part_1 = msgpack.serialize(timestamp, {typeHint:"int"});
-        //var msg_part_2 = msgpack.serialize(topic.getTypeIdx(), {typeHint:"int"});
-        //var msg_part_3 = msgpack.serialize(value, {typeHint:topic.type});
-        //
-        //var txData = Uint8Array.from([...msg_part_0, 
-        //                              ...msg_part_1,
-        //                              ...msg_part_2,
-        //                              ...msg_part_3,
-        //                            ]);
 
         this.ws_sendBinary(txData);
     }
@@ -367,6 +364,7 @@ export class NT4_Client {
         var timeTopic = new NT4_Topic();
         timeTopic.name = "Time";
         timeTopic.id = -1;
+        timeTopic.pubuid = -1;
         timeTopic.type = NT4_TYPESTR.INT; 
         this.serverTopics.set(timeTopic.id, timeTopic);
         
@@ -447,11 +445,8 @@ export class NT4_Client {
                 if(method === "announce"){
                     var newTopic = new NT4_Topic();
                     newTopic.name = params.name;
-                    if(params.pubuid != null){
-                        newTopic.id = params.pubuid; //Case, we had a pubid, so use this for the ID
-                    } else {
-                        newTopic.id = params.id; // Case, just use the id
-                    }
+                    newTopic.pubuid = params.pubuid; //might be undefiend?
+                    newTopic.id = params.id; 
                     newTopic.type = params.type;
                     newTopic.properties = params.properties;
                     this.serverTopics.set(newTopic.id, newTopic);
@@ -465,6 +460,8 @@ export class NT4_Client {
                     this.serverTopics.delete(removedTopic.id);
                     this.onTopicUnAnnounce(removedTopic);
 
+                } else if (method === "properties"){
+                    //TODO support property changes
                 } else {
                     console.log("Ignoring text message - unknown method " + method);
                     return;
@@ -521,6 +518,11 @@ export class NT4_Client {
     getNewSubUID(){
         this.subscription_uid_counter++;
         return this.subscription_uid_counter + this.clientIdx;
+    }
+
+    getNewPubUID(){
+        this.publish_uid_counter++;
+        return this.publish_uid_counter + this.clientIdx;
     }
 
 

@@ -92,22 +92,21 @@ public class Autonomous {
         // Create and subscribe to NT4 topics
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
-        curDelayModeTopic = inst.getIntegerTopic(delayModeList.getCurModeTopicName());
-        curMainModeTopic  = inst.getIntegerTopic(mainModeList.getCurModeTopicName());
-
-        desDelayModeTopic = inst.getIntegerTopic(delayModeList.getDesModeTopicName());
-        desMainModeTopic  = inst.getIntegerTopic(mainModeList.getDesModeTopicName());
-
-        desDelayModeSubscriber = desDelayModeTopic.subscribe(0);
-        desMainModeSubscriber  = desMainModeTopic.subscribe(0);
-
-        curDelayModePublisher = curDelayModeTopic.publish();
-        curMainModePublisher = curMainModeTopic.publish();
-        curDelayModePublisher.setDefault(0);
-        curMainModePublisher.setDefault(0);
-
+        // Delay mode current/desired NT entries
         curDelayMode = delayModeList.getDefault();
+        desDelayModeTopic = inst.getIntegerTopic(delayModeList.getDesModeTopicName());
+        desDelayModeSubscriber = desDelayModeTopic.subscribe(curDelayMode.idx);
+        curDelayModeTopic = inst.getIntegerTopic(delayModeList.getCurModeTopicName());
+        curDelayModePublisher = curDelayModeTopic.publish();
+        curDelayModePublisher.setDefault(curDelayMode.idx);
+
+        // Main mode current/desired NT entries
         curMainMode  = mainModeList.getDefault();
+        desMainModeTopic  = inst.getIntegerTopic(mainModeList.getDesModeTopicName());
+        desMainModeSubscriber  = desMainModeTopic.subscribe(curMainMode.idx);
+        curMainModeTopic  = inst.getIntegerTopic(mainModeList.getCurModeTopicName());
+        curMainModePublisher = curMainModeTopic.publish();
+        curMainModePublisher.setDefault(curMainMode.idx);
 
     }
 

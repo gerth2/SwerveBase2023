@@ -33,14 +33,14 @@ export class NT4_CalInf {
                                         this.onDisconnect.bind(this)
                                         );
 
-        this.nt4Client.subscribePeriodic(["/Calibrations"], 0.5);
+        this.nt4Client.subscribeAllSamples(["/Calibrations"]);
         this.nt4Client.ws_connect();
 
     }
     
     //Submit a new calibration value
     setCalibrationValue(name, value){
-        var valTopic = this.calNameToTopic(name, "Value");
+        var valTopic = this.calNameToTopic(name, "desValue");
         this.nt4Client.addSample(valTopic, this.nt4Client.getServerTime_us(), value);
     }
 
@@ -58,34 +58,37 @@ export class NT4_CalInf {
             if(!this.allCals.has(calName)){
                 var newCal = new CalObj();
                 newCal.name = calName;
-                this.allCals.set(calName, newCal);
-                this.onNewCalAdded(newCal);
                 newCal.units = topic.properties.units;
                 newCal.min = topic.properties.min_cal;
                 newCal.max = topic.properties.max_cal;
                 newCal.default =  topic.properties.default_val;
+                
+                //Publish a desVal topic for every curVal topic
+                var desValTopic = this.nt4Client.publishNewTopic(this.calNameToTopic(calName, "desValue"), topic.type);
+                this.nt4Client.setProperties(desValTopic, false, true);
+                
+                this.allCals.set(calName, newCal);
+                this.onNewCalAdded(newCal);
+
             }
         }
     }
 
     topicUnannounceHandler(topic){
-        if(this.isCalTopic(topicName, "Value")){
+        if(this.isCalTopic(topicName, "curValue")){
             var oldTopic = this.allCals.get(this.topicToCalName(topic));
             this.allCals.delete(this.topicToCalName(topic));
             //TODO call user hook
+            //TODO unpublish desired
         }
     }
 
     
     valueUpdateHandler(topic, timestamp, value){
-        if(this.isCalTopic(topic)){
+        if(this.isCalTopic(topic, "curValue")){
             var calName = this.topicToCalName(topic);
             var updatedCal = this.allCals.get(calName);
-
-            if(this.isCalTopic(topic, "Value")){
-                updatedCal.value = value;
-            } 
-
+            updatedCal.value = value;
             this.onCalValueUpdated(updatedCal); 
         } 
     }
