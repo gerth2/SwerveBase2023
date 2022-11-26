@@ -15,16 +15,13 @@ console.log("Connection Triggered");
 
 var table = document.getElementById("mainTable");
 
+var cellTopicIDMap = new Map();
+
 var subscription = null;
 
 mainRenderLoop();
 
 function topicAnnounceHandler( newTopic ) {
-    console.log("----------------------------");
-    console.log("Topic Announced");
-    console.log(newTopic.name);
-    console.log(newTopic.type);
-    console.log(newTopic.id);
 
     var newRow = table.insertRow();
     newRow.id = newTopic.id + "_row";
@@ -39,12 +36,11 @@ function topicAnnounceHandler( newTopic ) {
     valCell.prevValue = "";
     valCell.colorDecayCounter = 0;
 
+    cellTopicIDMap.set(newTopic.id, valCell);
+
 }
 
 function topicUnannounceHandler( removedTopic ) {
-    console.log("----------------------------");
-    console.log("Topic UnAnnounced");
-    console.log(removedTopic.name);
     document.getElementById(removedTopic.id + "_row").remove();
 }
 
@@ -95,9 +91,9 @@ function mainRenderLoop(){
 
 function valueUpdateHandler( topic, timestamp_us, value ) {
     //Update shown value
-    var valCell = document.getElementById(topic.id);
+    var valCell = cellTopicIDMap.get(topic.id);
     valCell.prevValue = valCell.innerHTML;
-    valCell.innerHTML = value.toString().padEnd(25, '\xa0'); //This feels hacky as all getout, but prevents table vibration.
+    valCell.innerHTML = value.toString().padEnd(60, '\xa0'); //This feels hacky as all getout, but prevents table vibration.
 
     if(valCell.prevValue !== valCell.innerHTML){
         valCell.colorDecayCounter = 25;
@@ -106,11 +102,6 @@ function valueUpdateHandler( topic, timestamp_us, value ) {
     //update time
     document.getElementById("curTime").innerHTML = "Time: ";
     document.getElementById("curTime").innerHTML += (timestamp_us / 1000000.0).toFixed(2);
-    //console.log("----------------------------");
-    //console.log("Values Updated");
-    //console.log(topic.name);
-    //console.log(timestamp_us);
-    //console.log(value);
 }
 
 function onConnect() {
@@ -148,7 +139,7 @@ function onDisconnect() {
 
 function subscribeToAll() {
     if(subscription == null){
-        subscription = nt4Client.subscribePeriodic(["/"], 0.02);
+        subscription = nt4Client.subscribePeriodic(["/"], 0.1);
     }
 
 }
