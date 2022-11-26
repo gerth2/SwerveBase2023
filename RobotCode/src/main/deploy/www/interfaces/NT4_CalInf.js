@@ -49,7 +49,7 @@ export class NT4_CalInf {
 
     topicAnnounceHandler(topic){
 
-        if(this.isCalTopic(topic)){
+        if(this.isCalTopic(topic, "curValue")){
             var calName = this.topicToCalName(topic);
 
             //we got something new related to calibrations...
@@ -75,7 +75,7 @@ export class NT4_CalInf {
     }
 
     topicUnannounceHandler(topic){
-        if(this.isCalTopic(topicName, "curValue")){
+        if(this.isCalTopic(topic, "curValue")){
             var oldTopic = this.allCals.get(this.topicToCalName(topic));
             this.allCals.delete(this.topicToCalName(topic));
             //TODO call user hook

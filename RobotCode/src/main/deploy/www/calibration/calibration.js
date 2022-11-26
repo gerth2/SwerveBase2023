@@ -56,10 +56,17 @@ function onCalValueChange(cal){
     calTilesMap.get(cal.name).updateDisplayedValues();
 }
 
-function onConnect(){
+function clearAll(){
     calTilesMap.clear();
+    for(var child of mainTable.children){
+        mainTable.removeChild(child);
+    }
+}
+
+function onConnect(){
+    clearAll();
 }
 
 function onDisconnect(){
-
+    clearAll();
 }
