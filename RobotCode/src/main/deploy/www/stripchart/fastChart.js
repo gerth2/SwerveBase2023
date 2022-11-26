@@ -263,7 +263,8 @@ export class FastChart {
     // Mouse-over cursor Handlers
     mouseoverHandler(e){
         if(this.mouseoverAtTimeCallback != null){
-            var time = this.xPxToTime(e.x);
+            var time = this.xPxToTime(e.offsetX);
+
             if(time > this.startTime && time < this.endTime){
                 this.mouseoverAtTimeCallback(time);
             } else {
@@ -287,7 +288,7 @@ export class FastChart {
         this.resetZoomRangeHandlers();
 
         //Save off the time where the user clicked down 
-        var time = this.xPxToTime(e.x);
+        var time = this.xPxToTime(e.offsetX);
         if(time > this.startTime && time < this.endTime){
             this.zoomRangeDn = time;
         } 
@@ -295,7 +296,7 @@ export class FastChart {
 
     mouseupHandler(e){
         //Save off the time where the user released
-        var time = this.xPxToTime(e.x);
+        var time = this.xPxToTime(e.offsetX);
         if(time > this.startTime && time < this.endTime){
             this.zoomRangeUp = time;
         } else {
@@ -374,7 +375,7 @@ export class FastChart {
     ///////////////////////////////////
     // Pixel/time/value/units 
     xPxToTime(x_px_in){
-        var frac = (x_px_in - this.plotOriginX_px)/(this.canvas.width- this.plotOriginX_px);
+        var frac = (x_px_in - this.plotOriginX_px)/(this.xAxisLen_px);
         return this.startTime + (this.endTime - this.startTime) * frac;
     }
 

@@ -61,7 +61,6 @@ export class Plot {
 
     setCursorPos(cursorTime_in){
         this.cursorTime = cursorTime_in;
-
     }
 
     setNumValueAxes(num_in){
