@@ -34,10 +34,7 @@ export class NT4_CalInf {
                                         );
 
         this.nt4Client.subscribePeriodic(["/Calibrations"], 0.5);
-
-        //this.statusTextCallback("Starting connection...");
         this.nt4Client.ws_connect();
-        //this.statusTextCallback("NT4 Connected.");
 
     }
     
@@ -63,7 +60,10 @@ export class NT4_CalInf {
                 newCal.name = calName;
                 this.allCals.set(calName, newCal);
                 this.onNewCalAdded(newCal);
-
+                newCal.units = topic.properties.units;
+                newCal.min = topic.properties.min_cal;
+                newCal.max = topic.properties.max_cal;
+                newCal.default =  topic.properties.default_val;
             }
         }
     }
@@ -84,16 +84,6 @@ export class NT4_CalInf {
 
             if(this.isCalTopic(topic, "Value")){
                 updatedCal.value = value;
-            } else if(this.isCalTopic(topic, "Name")){
-                updatedCal.name = value;
-            } else if(this.isCalTopic(topic, "Units")){
-                updatedCal.units = value;
-            } else if(this.isCalTopic(topic, "Min")){
-                updatedCal.min = value;
-            } else if(this.isCalTopic(topic, "Max")){
-                updatedCal.max = value;
-            } else if(this.isCalTopic(topic, "Default")){
-                updatedCal.default = value;
             } 
 
             this.onCalValueUpdated(updatedCal); 

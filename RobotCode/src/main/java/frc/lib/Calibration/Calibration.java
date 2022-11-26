@@ -75,18 +75,9 @@ public class Calibration {
     /** Lower limit on the allowed calibration range */
     public double min_cal;
 
-    StringTopic calUnitsTopic;
-    DoubleTopic calMinTopic;
-    DoubleTopic calMaxTopic;
-    DoubleTopic calDefaultTopic;
+
     DoubleTopic calValueTopic;
-
-    StringPublisher calUnitsPublisher;
-    DoublePublisher calMinPublisher;
-    DoublePublisher calMaxPublisher;
-    DoublePublisher calDefaultPublisher;
     DoublePublisher calValuePublisher;
-
     DoubleSubscriber calValueSubscriber;
 
     /**
@@ -205,23 +196,18 @@ public class Calibration {
 
         NetworkTableInstance inst = NetworkTableInstance.getDefault();
 
-        calUnitsTopic   = inst.getStringTopic(this.getUnitsTopic());
-        calMinTopic     = inst.getDoubleTopic(this.getMinTopic());
-        calMaxTopic     = inst.getDoubleTopic(this.getMaxTopic());
-        calDefaultTopic = inst.getDoubleTopic(this.getDefaultTopic());
         calValueTopic   = inst.getDoubleTopic(this.getValueTopic());
 
-        calUnitsPublisher   = calUnitsTopic.publish();
-        calMinPublisher     = calMinTopic.publish();   
-        calMaxPublisher     = calMaxTopic.publish();
-        calDefaultPublisher = calDefaultTopic.publish();
         calValuePublisher   = calValueTopic.publish();
 
-        calUnitsPublisher.setDefault(this.units);
-        calMinPublisher.setDefault(this.min_cal);   //Todo - these should probably be propreties
-        calMaxPublisher.setDefault(this.max_cal);   
-        calDefaultPublisher.setDefault(this.default_val);
         calValuePublisher.setDefault(this.cur_val);
+
+        calValueTopic.setProperties("{ \"units\" : \"" + this.units + "\"}");
+        calValueTopic.setProperties("{ \"min_cal\" : \"" + this.min_cal + "\"}");
+        calValueTopic.setProperties("{ \"max_cal\" : \"" + this.max_cal + "\"}");
+        calValueTopic.setProperties("{ \"default_val\" : \"" + this.default_val + "\"}");
+
+
 
         calValueSubscriber = calValueTopic.subscribe(this.cur_val);
 
