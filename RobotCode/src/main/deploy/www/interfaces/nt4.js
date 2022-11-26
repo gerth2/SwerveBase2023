@@ -282,7 +282,7 @@ export class NT4_Client {
     // Server/Client Time Sync Handling
 
     getClientTime_us() {
-        return new Date().getTime() * 1000;
+        return Math.round(performance.now() * 1000.0);
     }
 
     getServerTime_us() {
