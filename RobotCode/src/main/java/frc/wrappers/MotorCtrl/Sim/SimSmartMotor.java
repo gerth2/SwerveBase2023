@@ -147,6 +147,7 @@ public class SimSmartMotor extends AbstractSimmableMotorController {
 
         var velError_RPM = Units.radiansPerSecondToRotationsPerMinute(vel_cmd - getVelocity_radpersec());
 
+        // Simulate sensor dropout... or just the whole "close enough to zero" behavior
         if(Math.abs(velError_RPM) < 5.0){
             velError_RPM = 0;
         }
