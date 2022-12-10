@@ -4,18 +4,15 @@ package frc.robot.Drivetrain;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.numbers.N5;
-import edu.wpi.first.math.numbers.N7;
 import edu.wpi.first.math.util.Units;
 
 import frc.Constants;
@@ -38,21 +35,20 @@ public class DrivetrainPoseEstimator {
 
     CasseroleADXRS453 gyro;
 
-    SwerveDrivePoseEstimator<N7, N7, N5> m_poseEstimator;
+    //SwerveDrivePoseEstimator<N7, N7, N5> m_poseEstimator;
+
+    SwerveDrivePoseEstimator m_poseEstimator;
 
     List<CasserolePhotonCam> cams = new ArrayList<CasserolePhotonCam>();
 
     //Trustworthiness of the internal model of how motors should be moving
     // Measured in expected standard deviation (meters of position and degrees of rotation)
-    Vector<N7> stateStdDevs  = VecBuilder.fill(0.05, 0.05, Units.degreesToRadians(5), 0.05, 0.05, 0.05, 0.05);
-
-
-    //Trustworthiness of gyro in radians of standard deviation.
-    Vector<N5> localMeasurementStdDevs  = VecBuilder.fill(Units.degreesToRadians(0.01), 0.01, 0.01, 0.01, 0.01);
+    Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
 
     //Trustworthiness of the vision system
     // Measured in expected standard deviation (meters of position and degrees of rotation)
-    Vector<N3> visionMeasurementStdDevs = VecBuilder.fill(0.5, 0.5, Units.degreesToRadians(30));
+    Matrix<N3, N1>  visionMeasurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
+
 
 
     @Signal(units = "ft/sec")
@@ -68,17 +64,13 @@ public class DrivetrainPoseEstimator {
 
         //Temp default - will poopulate with real valeus in the resetPosition method
         SwerveModulePosition[] initialStates = {new SwerveModulePosition(),new SwerveModulePosition(),new SwerveModulePosition(),new SwerveModulePosition()};
-            
-        m_poseEstimator = new SwerveDrivePoseEstimator<N7, N7, N5>(
-            Nat.N7(),
-            Nat.N7(),
-            Nat.N5(),
+
+        m_poseEstimator = new SwerveDrivePoseEstimator(
+            Constants.m_kinematics,
             new Rotation2d(),
             initialStates,
             new Pose2d(),
-            Constants.m_kinematics,
             stateStdDevs,
-            localMeasurementStdDevs,
             visionMeasurementStdDevs
             );
 
@@ -105,10 +97,9 @@ public class DrivetrainPoseEstimator {
         gyro.update();
 
         //Based on gyro and measured module speeds and positions, estimate where our robot should have moved to.
-        SwerveModuleState[] states = DrivetrainControl.getInstance().getModuleActualStates();
         SwerveModulePosition[] positions = DrivetrainControl.getInstance().getModuleActualPositions();
         Pose2d prevEstPose = curEstPose;
-        curEstPose = m_poseEstimator.update(getGyroHeading(), states, positions);
+        curEstPose = m_poseEstimator.update(getGyroHeading(), positions);
 
         //Calculate a "speedometer" velocity in ft/sec
         Transform2d deltaPose = new Transform2d(prevEstPose, curEstPose);
