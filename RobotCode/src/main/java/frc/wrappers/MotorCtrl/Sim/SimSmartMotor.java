@@ -94,7 +94,7 @@ public class SimSmartMotor extends AbstractSimmableMotorController {
     }
 
     public double sim_getWindingVoltage(){
-        return curWindingVoltage;
+        return curWindingVoltage * curLimitFactor;
     }
 
     public void sim_setSupplyVoltage(double supply_V){
@@ -116,6 +116,27 @@ public class SimSmartMotor extends AbstractSimmableMotorController {
         }
     }
 
+    @Signal
+    double curLimitFactor = 1.0;
+    final double CURRENT_LIM_I_GAIN = 0.02;
+    public void sim_updateCurrentLimit(){
+        // whelp. Super rough aproximation of a current limit. Just an I gain on 
+        // whether or not we're above the current limit. Should be updated faster
+        // at the sim ts rate
+
+        double err = 40.0 - Math.abs(curCurrent);
+        curLimitFactor += Constants.SIM_SAMPLE_RATE_SEC*CURRENT_LIM_I_GAIN*err;
+
+        if(curLimitFactor > 1.0){
+            curLimitFactor = 1.0;
+        }
+
+        if(curLimitFactor < 0.0){
+            curLimitFactor = 0.0;
+        }
+
+    }
+
 
     double velErr_accum;
     double velErr_prev;
@@ -125,6 +146,10 @@ public class SimSmartMotor extends AbstractSimmableMotorController {
     private double pidSim(double vel_cmd, double arb_ff_V){
 
         var velError_RPM = Units.radiansPerSecondToRotationsPerMinute(vel_cmd - getVelocity_radpersec());
+
+        if(Math.abs(velError_RPM) < 5.0){
+            velError_RPM = 0;
+        }
         
         velErr_accum += velError_RPM;
         
@@ -152,7 +177,7 @@ public class SimSmartMotor extends AbstractSimmableMotorController {
 
     @Override
     public double getAppliedVoltage_V() {
-        return curWindingVoltage;
+        return sim_getWindingVoltage();
     }
 
     @Override

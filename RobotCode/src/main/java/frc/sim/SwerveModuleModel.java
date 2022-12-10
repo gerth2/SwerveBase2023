@@ -87,6 +87,8 @@ class SwerveModuleModel{
 
         wheelMotorCtrl.sim_setSupplyVoltage(batteryVoltage);
         azmthMotorCtrl.sim_setSupplyVoltage(batteryVoltage);
+        wheelMotorCtrl.sim_updateCurrentLimit();
+        azmthMotorCtrl.sim_updateCurrentLimit();
 
         double wheelVoltage = 0;
         double azmthVoltage = 0;
