@@ -1,6 +1,5 @@
 package frc.robot.Autonomous.Modes;
 import edu.wpi.first.math.geometry.Pose2d;
-import frc.Constants;
 import frc.lib.AutoSequencer.AutoSequencer;
 import frc.lib.Autonomous.AutoMode;
 import frc.robot.Autonomous.Events.AutoEventJSONTrajectory;

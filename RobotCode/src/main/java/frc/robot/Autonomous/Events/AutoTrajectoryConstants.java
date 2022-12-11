@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.util.Units;
+import frc.Constants;
 
 public class AutoTrajectoryConstants {
 
@@ -16,8 +17,7 @@ public class AutoTrajectoryConstants {
         var max_vel_mps = Units.feetToMeters(MAX_AUTO_DT_SPEED_FPS);
         var max_accel_mpss = max_vel_mps / 2.0;
         var cfg = new TrajectoryConfig(max_vel_mps, max_accel_mpss);
-        //TODO - apply drivetrain kinematic constraints to the trajectory generation
-        //cfg.setKinematics(Constants.kDtKinematics);
+        cfg.setKinematics(Constants.m_kinematics);
         //TODO - voltage/current constraints?
         return cfg;
 

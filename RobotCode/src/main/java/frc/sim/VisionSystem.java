@@ -1,8 +1,5 @@
 package frc.sim;
 
-import org.photonvision.SimVisionSystem;
-import org.photonvision.SimVisionTarget;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.util.Units;
