@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.lib.Signal.Annotations.Signal;
 import frc.robot.Drivetrain.DrivetrainControl;
 
 public class AutoDrive {
@@ -70,6 +71,11 @@ public class AutoDrive {
     Rotation2d startHeading;
     Rotation2d endHeading;
 
+    @Signal
+    double curAutoCmdRotDeg;
+    @Signal
+    double curAutoCmdRotVelDegPerSec;
+
     public AutoDrive(){
 
     }
@@ -107,6 +113,8 @@ public class AutoDrive {
             waypoints.start = dt.getCurEstPose();
             waypoints.startRot = dt.getCurEstPose().getRotation();
             waypoints.interiorWaypoints = new ArrayList<Translation2d>();
+
+            //Default - end where we started (safe)
             waypoints.end = waypoints.start;
             waypoints.endRot = waypoints.startRot;
 
@@ -153,7 +161,12 @@ public class AutoDrive {
                 dt.setCmdRobotRelative(manualFwdRevCmd, manualStrafeCmd, manualRotateCmd);
             }
         } else if(curState == AutoDriveState.RUNNING_TRAJECTORY) {
-            dt.setCmdTrajectory(curTraj.getCurCmd());
+            var curCmd = curTraj.getCurCmd();
+            dt.setCmdTrajectory(curCmd);
+
+            //Debug signals
+            curAutoCmdRotVelDegPerSec = curCmd.desAngVel.getDegrees();
+            curAutoCmdRotDeg = curCmd.desAngle.getDegrees();
 
         } else {
             dt.setCmdRobotRelative(0, 0, 0);

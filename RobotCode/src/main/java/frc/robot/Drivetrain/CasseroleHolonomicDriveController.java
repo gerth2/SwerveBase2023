@@ -76,11 +76,19 @@ public class CasseroleHolonomicDriveController {
     m_poseTolerance = tolerance;
   }
 
-  @Signal(units="mps")
-  double linRefFF = 0;
 
+  @Signal(units="mps")
+  double xFF;
+  @Signal(units="mps")
+  double yFF;
   @Signal(units="radpersec")
-  double curvatureFF = 0;
+  double thetaFF;
+  @Signal(units="mps")
+  double xFeedback;
+  @Signal(units="mps")
+  double yFeedback;
+  @Signal(units="radpersec")
+  double thetaFeedback;
 
   /**
    * Returns the next output of the holonomic drive controller.
@@ -102,12 +110,9 @@ public class CasseroleHolonomicDriveController {
     }
 
     // Calculate feedforward velocities (field-relative).
-    double xFF = linearVelocityRefMeters * poseRef.getRotation().getCos();
-    double yFF = linearVelocityRefMeters * poseRef.getRotation().getSin();
-    double thetaFF = angleVelRef.getRadians();
-
-    linRefFF = linearVelocityRefMeters;
-    curvatureFF = curvatureRefRadPerMeter;
+    xFF = linearVelocityRefMeters * poseRef.getRotation().getCos();
+    yFF = linearVelocityRefMeters * poseRef.getRotation().getSin();
+    thetaFF = angleVelRef.getRadians();
 
     m_poseError = poseRef.relativeTo(currentPose);
     m_rotationError = angleRef.minus(currentPose.getRotation());
@@ -117,9 +122,9 @@ public class CasseroleHolonomicDriveController {
     }
 
     // Calculate feedback velocities (based on position error).
-    double xFeedback = m_xController.calculate(currentPose.getX(), poseRef.getX());
-    double yFeedback = m_yController.calculate(currentPose.getY(), poseRef.getY());
-    double thetaFeedback = m_thetaController.calculate(currentPose.getRotation().getRadians(), angleRef.getRadians());
+    xFeedback = m_xController.calculate(currentPose.getX(), poseRef.getX());
+    yFeedback = m_yController.calculate(currentPose.getY(), poseRef.getY());
+    thetaFeedback = m_thetaController.calculate(currentPose.getRotation().getRadians(), angleRef.getRadians());
 
 
     // Return next output.

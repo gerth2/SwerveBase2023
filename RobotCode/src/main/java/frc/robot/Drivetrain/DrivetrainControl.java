@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import frc.Constants;
 import frc.lib.Calibration.Calibration;
+import frc.lib.Signal.Annotations.Signal;
 import frc.lib.Util.FunctionGenerator;
 
 public class DrivetrainControl {
@@ -74,6 +75,12 @@ public class DrivetrainControl {
 
     // Current chassis speed commands, based on desired pose or driver command inputs
     ChassisSpeeds desChSpd = new ChassisSpeeds(0, 0, 0);
+    @Signal
+    double desChSpdVx;
+    @Signal
+    double desChSpdVy;
+    @Signal
+    double desChSpdOmega;
 
     // Current module desired states, translated out of chassis speeds or test inputs or whatever.
     SwerveModuleState[] desModState;
@@ -139,6 +146,7 @@ public class DrivetrainControl {
         desChSpd = ChassisSpeeds.fromFieldRelativeSpeeds(fwdRevCmd, strafeCmd, rotateCmd, pe.getGyroHeading());
         curDesPose = pe.getEstPose();
         initAngleOnly = false;
+        hdc_rotate.reset(pe.getGyroHeading().getRadians());
     }
 
     // Commands the robot to travel at a certain speed relative to itself.
@@ -149,6 +157,7 @@ public class DrivetrainControl {
         desChSpd = new ChassisSpeeds(fwdRevCmd, strafeCmd, rotateCmd);
         curDesPose = pe.getEstPose();
         initAngleOnly = false;
+        hdc_rotate.reset(pe.getGyroHeading().getRadians());
     }
 
     // Autonomous-centric way to command the drivetrain via a Trajectory.
@@ -179,7 +188,11 @@ public class DrivetrainControl {
     // Main periodic step function for Teleop, Autonomous, and Disabled
     public void update(){
 
-        boolean motionCommanded = Math.abs(desChSpd.vxMetersPerSecond) > 0.01 | Math.abs(desChSpd.vyMetersPerSecond) > 0.01 | Math.abs(desChSpd.omegaRadiansPerSecond) > 0.01;
+        desChSpdVx = desChSpd.vxMetersPerSecond;
+        desChSpdVy = desChSpd.vyMetersPerSecond;
+        desChSpdOmega = desChSpd.omegaRadiansPerSecond;
+
+        boolean motionCommanded = Math.abs(desChSpdVx) > 0.01 | Math.abs(desChSpdVy) > 0.01 | Math.abs(desChSpdOmega) > 0.01;
 
         if(motionCommanded | initAngleOnly){
             //In motion
