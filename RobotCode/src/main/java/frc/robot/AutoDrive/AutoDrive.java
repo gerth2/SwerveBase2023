@@ -39,8 +39,7 @@ public class AutoDrive {
     public enum AutoDriveState{ 
 		MANUAL(0), // Passing driver commands through to the drivetrain
 		GENERATING_TRAJECTORY(1), //Driver commands still active, but a trajectory is being generated in the background
-		RUNNING_TRAJECTORY(2), //Trajectory is available, and is currently being run.
-        DONE(3); //Trajectory has finished. Waiting for next command.
+		RUNNING_TRAJECTORY(2); //Trajectory is available, and is currently being run.
 
 		public final int value;
 
@@ -134,10 +133,9 @@ public class AutoDrive {
 
             // Start the dynamic generation
             curTraj = new DynamicSwerveTrajectoryGenerator();
-            curTraj.startGeneration(waypoints);
-
-            
+            curTraj.startGeneration(waypoints);            
             curState = AutoDriveState.GENERATING_TRAJECTORY;
+            
         } else if (curState == AutoDriveState.GENERATING_TRAJECTORY){
             if(curTraj.isReady()){
                 System.out.println("[AutoDrive] Starting trajectory...");
@@ -145,11 +143,7 @@ public class AutoDrive {
                 curState = AutoDriveState.RUNNING_TRAJECTORY;
             }
         } else if(curState == AutoDriveState.RUNNING_TRAJECTORY){
-            if(curTraj.isFinished()){
-                System.out.println("[AutoDrive] Trajectory Complete.");
-                curState = AutoDriveState.DONE;
-
-            }
+            // No transitino until driver releases command
         }
 
 
