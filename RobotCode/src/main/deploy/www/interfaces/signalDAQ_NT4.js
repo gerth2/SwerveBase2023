@@ -121,22 +121,17 @@ export class SignalDAQNT4 {
     }
 
     sigNameToValueTopic(name){
-        return "/Signals/" + name + "/value"
+        return "/Signals/" + name
     }
 
     valueTopicToSigName(topic){
         var tmp = topic.name;
         tmp = tmp.replace(/^\/Signals\//, '');
-        tmp = tmp.replace(/\/value/, '');
         return tmp;
     }
 
     isSignalValueTopic(topic){
-        return topic.match(/Signals\/[a-zA-Z0-9\._]+\/value/);
-    }
-
-    isSignalValueTopic(topic){
-        return topic.name.match(/^\/Signals\/[a-zA-Z0-9\._]+\/value/);
+        return topic.match(/Signals\/[a-zA-Z0-9\._]+/);
     }
 
 

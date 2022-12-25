@@ -80,7 +80,5 @@ public class Signal {
     }
 
     public String getNT4ValueTopicName(){ return SignalUtils.nameToNT4ValueTopic(this.name); }
-    public String getNT4UnitsTopicName(){ return SignalUtils.nameToNT4UnitsTopic(this.name); }
-
 
 }
