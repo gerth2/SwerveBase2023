@@ -1,4 +1,4 @@
-package frc.wrappers;
+package frc.hardwareWrappers;
 
 import java.util.HashMap;
 

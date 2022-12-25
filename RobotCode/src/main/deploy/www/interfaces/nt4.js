@@ -516,7 +516,7 @@ export class NT4_Client {
         var port = 5810; //fallback - unsecured
         var prefix = "ws://";
 
-        this.serverAddr = prefix + this.serverBaseAddr + ":" + port.toString() + "/nt/" + "CasseroleWS2_" + this.clientIdx.toString();
+        this.serverAddr = prefix + this.serverBaseAddr + ":" + port.toString() + "/nt/" + "JSClient_" + this.clientIdx.toString();
 
         this.ws = new WebSocket(this.serverAddr, "networktables.first.wpi.edu");
         this.ws.binaryType = "arraybuffer";

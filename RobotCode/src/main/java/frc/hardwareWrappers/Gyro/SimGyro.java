@@ -1,14 +1,14 @@
-package frc.wrappers.ADXRS453;
+package frc.hardwareWrappers.Gyro;
 
 import frc.Constants;
-import frc.wrappers.SimDeviceBanks;
+import frc.hardwareWrappers.SimDeviceBanks;
 
-public class SimADXRS453 extends AbstractADXRS453 {
+public class SimGyro extends AbstractGyro {
 
     double rate; // in rad/sec
     double angle; // in rad
 
-    public SimADXRS453(){
+    public SimGyro(){
         SimDeviceBanks.addSPIDevice(this, 0); //todo are we actually on CS 0?
     }
 

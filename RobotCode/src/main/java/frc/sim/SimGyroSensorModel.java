@@ -3,12 +3,12 @@ package frc.sim;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
 import frc.Constants;
-import frc.wrappers.SimDeviceBanks;
-import frc.wrappers.ADXRS453.SimADXRS453;
+import frc.hardwareWrappers.SimDeviceBanks;
+import frc.hardwareWrappers.Gyro.SimGyro;
 
 public class SimGyroSensorModel{
 
-    SimADXRS453 gyroSim;
+    SimGyro gyroSim;
     double gyroPosReading_deg;
 
     // Limit what the gyro itself can read
@@ -17,7 +17,7 @@ public class SimGyroSensorModel{
     final double GYRO_MAX_MEASURABLE_RATE_DEGPERSEC = 400.0;
 
     public SimGyroSensorModel(){
-        gyroSim = (SimADXRS453) SimDeviceBanks.getSPIDevice(0);
+        gyroSim = (SimGyro) SimDeviceBanks.getSPIDevice(0);
 
     }
 

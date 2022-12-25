@@ -1,10 +1,11 @@
-package frc.wrappers.SwerveAzmthEncoder;
+package frc.hardwareWrappers.SwerveAzmthEncoder.SRXEncoder;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
+import frc.hardwareWrappers.SwerveAzmthEncoder.AbstractSwerveAzmthEncoder;
 import frc.lib.Signal.Annotations.Signal;
 
-public class RealSwerveAzmthEncoder extends AbstractSwerveAzmthEncoder {
+public class RealSRXEncoder extends AbstractSwerveAzmthEncoder {
 
     DigitalInput m_digitalInput;
     DutyCycle m_dutyCycle;
@@ -12,7 +13,7 @@ public class RealSwerveAzmthEncoder extends AbstractSwerveAzmthEncoder {
     @Signal(units="Hz")
     double freq;
 
-    public RealSwerveAzmthEncoder(int port){
+    public RealSRXEncoder(int port){
         m_digitalInput = new DigitalInput(port);
         m_dutyCycle = new DutyCycle(m_digitalInput);
     }

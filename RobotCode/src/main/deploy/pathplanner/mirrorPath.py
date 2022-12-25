@@ -1,5 +1,9 @@
 import json, os
 
+# Tiny little script to quickly take a pathplanner .path file, and mirror all the waypoints 
+# to the other side of the field.
+# Only tested against 2022 version, may not work for 2023
+
 fileList = [
     "many_Pickup1.path",
     "many_Pickup2.path"

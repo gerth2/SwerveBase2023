@@ -1,21 +1,17 @@
-package frc.wrappers.ADXRS453;
+package frc.hardwareWrappers.Gyro.ADXRS453;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.SPI.Port;
+import frc.hardwareWrappers.Gyro.AbstractGyro;
 
-public class RealADXRS453 extends AbstractADXRS453 {
+public class RealADXRS453 extends AbstractGyro {
 
     ADXRS450_Gyro realGyro;
 
     public RealADXRS453(){
         realGyro = new ADXRS450_Gyro(Port.kOnboardCS0);
-        
-        System.out.println("======================================");
-        System.out.println("== GYRO: CALIBRATION IN PROCESS...");
         realGyro.calibrate();
-        System.out.println("== ... Complete!");
-        System.out.println("======================================");
     }
 
     @Override
@@ -25,7 +21,11 @@ public class RealADXRS453 extends AbstractADXRS453 {
 
     @Override
     public void calibrate() {
+        System.out.println("======================================================");
+        System.out.println("== GYRO: CALIBRATION IN PROCESS, DO NOT MOVE ROBOT...");
         realGyro.calibrate();
+        System.out.println("== ... Complete!");
+        System.out.println("======================================================");
     }
 
     @Override

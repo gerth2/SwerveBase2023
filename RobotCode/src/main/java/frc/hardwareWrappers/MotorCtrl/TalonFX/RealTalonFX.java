@@ -1,4 +1,4 @@
-package frc.wrappers.MotorCtrl.TalonFX;
+package frc.hardwareWrappers.MotorCtrl.TalonFX;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.DemandType;
@@ -11,7 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.util.Units;
-import frc.wrappers.MotorCtrl.AbstractSimmableMotorController;
+import frc.hardwareWrappers.MotorCtrl.AbstractSimmableMotorController;
 
 public class RealTalonFX extends AbstractSimmableMotorController {
 

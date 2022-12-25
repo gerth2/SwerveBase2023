@@ -1,7 +1,7 @@
-package frc.wrappers.ADXRS453;
+package frc.hardwareWrappers.Gyro;
 
 
-public abstract class AbstractADXRS453 {
+public abstract class AbstractGyro {
 
     public abstract void reset();
     public abstract void calibrate();

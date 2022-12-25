@@ -1,4 +1,4 @@
-package frc.wrappers.MotorCtrl.SparkMax;
+package frc.hardwareWrappers.MotorCtrl.SparkMax;
 
 
 import com.revrobotics.CANSparkMax;
@@ -11,7 +11,7 @@ import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.util.Units;
 import frc.UnitUtils;
-import frc.wrappers.MotorCtrl.AbstractSimmableMotorController;
+import frc.hardwareWrappers.MotorCtrl.AbstractSimmableMotorController;
 
 
 public class RealSparkMax extends AbstractSimmableMotorController {

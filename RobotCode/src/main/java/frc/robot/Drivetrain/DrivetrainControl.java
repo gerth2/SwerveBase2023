@@ -71,7 +71,7 @@ public class DrivetrainControl {
     PIDController hdc_fwdrev;
     PIDController hdc_leftright;
     ProfiledPIDController hdc_rotate;
-    CasseroleHolonomicDriveController hdc;
+    CustomHolonomicDriveController hdc;
 
     // Current chassis speed commands, based on desired pose or driver command inputs
     ChassisSpeeds desChSpd = new ChassisSpeeds(0, 0, 0);
@@ -119,7 +119,7 @@ public class DrivetrainControl {
                                                     Constants.MAX_ROTATE_ACCEL_RAD_PER_SEC_2 * 0.8));
         hdc_rotate.enableContinuousInput(-1.0 * Math.PI, Math.PI);
 
-        hdc = new CasseroleHolonomicDriveController(hdc_fwdrev, hdc_leftright, hdc_rotate);
+        hdc = new CustomHolonomicDriveController(hdc_fwdrev, hdc_leftright, hdc_rotate);
 
         hdc.setEnabled(true);
 

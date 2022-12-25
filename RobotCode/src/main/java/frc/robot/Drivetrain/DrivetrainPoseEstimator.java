@@ -16,9 +16,10 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 
 import frc.Constants;
+import frc.hardwareWrappers.Gyro.WrapperedGyro;
+import frc.hardwareWrappers.Gyro.WrapperedGyro.GyroType;
 import frc.lib.Signal.Annotations.Signal;
-import frc.robot.Drivetrain.Camera.CasserolePhotonCam;
-import frc.wrappers.ADXRS453.CasseroleADXRS453;
+import frc.robot.Drivetrain.Camera.PhotonCamWrapper;
 
 public class DrivetrainPoseEstimator {
 
@@ -33,13 +34,13 @@ public class DrivetrainPoseEstimator {
 
     Pose2d curEstPose = new Pose2d(Constants.DFLT_START_POSE.getTranslation(), Constants.DFLT_START_POSE.getRotation());
 
-    CasseroleADXRS453 gyro;
+    WrapperedGyro gyro;
 
     //SwerveDrivePoseEstimator<N7, N7, N5> m_poseEstimator;
 
     SwerveDrivePoseEstimator m_poseEstimator;
 
-    List<CasserolePhotonCam> cams = new ArrayList<CasserolePhotonCam>();
+    List<PhotonCamWrapper> cams = new ArrayList<PhotonCamWrapper>();
 
     //Trustworthiness of the internal model of how motors should be moving
     // Measured in expected standard deviation (meters of position and degrees of rotation)
@@ -56,11 +57,11 @@ public class DrivetrainPoseEstimator {
 
     private DrivetrainPoseEstimator(){
 
-        cams.add(new CasserolePhotonCam("FRONT_CAM", Constants.robotToFrontCameraTrans)); 
-        cams.add(new CasserolePhotonCam("REAR_CAM", Constants.robotToRearCameraTrans)); 
+        cams.add(new PhotonCamWrapper("FRONT_CAM", Constants.robotToFrontCameraTrans)); 
+        cams.add(new PhotonCamWrapper("REAR_CAM", Constants.robotToRearCameraTrans)); 
         //TODO add more cameras here
 
-        gyro = new CasseroleADXRS453();
+        gyro = new WrapperedGyro(GyroType.ADXRS453);
 
         //Temp default - will poopulate with real valeus in the resetPosition method
         SwerveModulePosition[] initialStates = {new SwerveModulePosition(),new SwerveModulePosition(),new SwerveModulePosition(),new SwerveModulePosition()};

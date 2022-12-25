@@ -7,18 +7,19 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import frc.Constants;
 import frc.UnitUtils;
+import frc.hardwareWrappers.MotorCtrl.WrapperedCANMotorCtrl;
+import frc.hardwareWrappers.SwerveAzmthEncoder.WrapperedSwerveAzmthEncoder;
+import frc.hardwareWrappers.SwerveAzmthEncoder.WrapperedSwerveAzmthEncoder.SwerveAzmthEncType;
 import frc.lib.Signal.Annotations.Signal;
 import frc.lib.Util.MapLookup2D;
 import frc.lib.Webserver2.DashboardConfig.SwerveStateTopicSet;
 import frc.robot.Robot;
-import frc.wrappers.MotorCtrl.CasseroleCANMotorCtrl;
-import frc.wrappers.SwerveAzmthEncoder.CasseroleSwerveAzmthEncoder;
 
 class SwerveModuleControl {
 
-    CasseroleCANMotorCtrl wheelMotorCtrl;
-    CasseroleCANMotorCtrl azmthMotorCtrl;
-    CasseroleSwerveAzmthEncoder azmth_enc;
+    WrapperedCANMotorCtrl wheelMotorCtrl;
+    WrapperedCANMotorCtrl azmthMotorCtrl;
+    WrapperedSwerveAzmthEncoder azmth_enc;
 
     SwerveModuleState desState = new SwerveModuleState();
     SwerveModuleState optState = new SwerveModuleState();
@@ -48,9 +49,9 @@ class SwerveModuleControl {
 
     public SwerveModuleControl(String modName, int wheelMotorIdx, int azmthMotorIdx, int azmthEncoderIdx, double azmthOffset, boolean invertWheel){
 
-        wheelMotorCtrl = new CasseroleCANMotorCtrl("wheel"+modName, wheelMotorIdx, CasseroleCANMotorCtrl.CANMotorCtrlType.TALON_FX);
-        azmthMotorCtrl = new CasseroleCANMotorCtrl("azmth"+modName, azmthMotorIdx, CasseroleCANMotorCtrl.CANMotorCtrlType.SPARK_MAX);
-        azmth_enc = new CasseroleSwerveAzmthEncoder("encoder"+modName, azmthEncoderIdx, azmthOffset);
+        wheelMotorCtrl = new WrapperedCANMotorCtrl("wheel"+modName, wheelMotorIdx, WrapperedCANMotorCtrl.CANMotorCtrlType.TALON_FX);
+        azmthMotorCtrl = new WrapperedCANMotorCtrl("azmth"+modName, azmthMotorIdx, WrapperedCANMotorCtrl.CANMotorCtrlType.SPARK_MAX);
+        azmth_enc = new WrapperedSwerveAzmthEncoder(SwerveAzmthEncType.SRXEncoder, "encoder"+modName, azmthEncoderIdx, azmthOffset);
       
         wheelMotorCtrl.setInverted(invertWheel);
         azmthMotorCtrl.setInverted(true);

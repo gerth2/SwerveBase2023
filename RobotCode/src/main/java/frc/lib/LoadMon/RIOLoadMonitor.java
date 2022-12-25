@@ -57,7 +57,7 @@ import frc.robot.Robot;
  * 
  */
 
-public class CasseroleRIOLoadMonitor {
+public class RIOLoadMonitor {
 	
 	/** Rate of update of the load variables in milliseconds. 1s should be enough? */
 	public static final int UPDATE_RATE_MS = 1000;
@@ -94,7 +94,7 @@ public class CasseroleRIOLoadMonitor {
 	 * Constructor. Initalizes measurement system and starts a slow
 	 * background thread to gather load info
 	 */
-	public CasseroleRIOLoadMonitor(){
+	public RIOLoadMonitor(){
 
 		if(Robot.isSimulation()){
 			return; //nothing to do for simulation.

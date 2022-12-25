@@ -27,11 +27,9 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import frc.lib.Logging.LogFileWrangler;
 import frc.lib.Webserver2.DashboardConfig.DashboardConfig;
@@ -75,22 +73,12 @@ public class Webserver2 {
         server.setHandler(context);
 
         final HttpConfiguration httpConfiguration = new HttpConfiguration();
-        httpConfiguration.setSecureScheme("https");
-        httpConfiguration.setSecurePort(5804);
 
-        final ServerConnector http = new ServerConnector(server,
-            new HttpConnectionFactory(httpConfiguration));
+        final ServerConnector http = new ServerConnector(server,new HttpConnectionFactory(httpConfiguration));
         http.setPort(5805);
         server.addConnector(http);
-        final SslContextFactory sslContextFactory = new SslContextFactory(resourceBase + "/../keystore/localkey.jks");
-        sslContextFactory.setKeyStorePassword("aaaaaa");
         final HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
         httpsConfiguration.addCustomizer(new SecureRequestCustomizer());
-        final ServerConnector httpsConnector = new ServerConnector(server,
-            new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-            new HttpConnectionFactory(httpsConfiguration));
-        httpsConnector.setPort(5804);
-        server.addConnector(httpsConnector);
 
 
         ResourceHandler log_files_rh = new ResourceHandler();

@@ -25,7 +25,7 @@ import frc.lib.Signal.Annotations.Signal;
  * point toward. This heading reference is profiled for smoothness.
  */
 @SuppressWarnings("MemberName")
-public class CasseroleHolonomicDriveController {
+public class CustomHolonomicDriveController {
   private Pose2d m_poseError = new Pose2d();
   private Rotation2d m_rotationError = new Rotation2d();
   private Pose2d m_poseTolerance = new Pose2d();
@@ -45,7 +45,7 @@ public class CasseroleHolonomicDriveController {
    * @param thetaController A profiled PID controller to respond to error in angle.
    */
   @SuppressWarnings("ParameterName")
-  public CasseroleHolonomicDriveController(
+  public CustomHolonomicDriveController(
       PIDController xController, PIDController yController, ProfiledPIDController thetaController) {
     m_xController = xController;
     m_yController = yController;

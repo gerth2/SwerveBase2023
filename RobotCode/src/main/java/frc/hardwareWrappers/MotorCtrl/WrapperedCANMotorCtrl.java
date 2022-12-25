@@ -1,12 +1,12 @@
-package frc.wrappers.MotorCtrl;
+package frc.hardwareWrappers.MotorCtrl;
 
+import frc.hardwareWrappers.MotorCtrl.Sim.SimSmartMotor;
+import frc.hardwareWrappers.MotorCtrl.SparkMax.RealSparkMax;
+import frc.hardwareWrappers.MotorCtrl.TalonFX.RealTalonFX;
 import frc.lib.Signal.Annotations.Signal;
 import frc.robot.Robot;
-import frc.wrappers.MotorCtrl.Sim.SimSmartMotor;
-import frc.wrappers.MotorCtrl.SparkMax.RealSparkMax;
-import frc.wrappers.MotorCtrl.TalonFX.RealTalonFX;
 
-public class CasseroleCANMotorCtrl {
+public class WrapperedCANMotorCtrl {
 
     public enum CANMotorCtrlType {
         TALON_FX,
@@ -30,10 +30,9 @@ public class CasseroleCANMotorCtrl {
     @Signal(units = "rad")
     private double actPos;
 
-    public CasseroleCANMotorCtrl(String prefix, int can_id, CANMotorCtrlType type){
+    public WrapperedCANMotorCtrl(String prefix, int can_id, CANMotorCtrlType type){
 
-        System.out.println("======================================");
-        System.out.println("== Starting motor controller init for " + prefix + " CANID = " + Integer.toString(can_id));
+        System.out.print("=> Starting motor controller init for " + prefix + " CANID = " + Integer.toString(can_id));
 
         if(Robot.isSimulation()){
             ctrl = new SimSmartMotor(can_id);
@@ -47,8 +46,7 @@ public class CasseroleCANMotorCtrl {
                     break;
             }
         }
-        System.out.println("== ... Done!");
-        System.out.println("======================================");
+        System.out.println(" ... Done!");
 
     }
     

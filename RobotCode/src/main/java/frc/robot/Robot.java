@@ -16,7 +16,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.lib.Calibration.CalWrangler;
-import frc.lib.LoadMon.CasseroleRIOLoadMonitor;
+import frc.lib.LoadMon.RIOLoadMonitor;
 import frc.lib.LoadMon.SegmentTimeTracker;
 import frc.lib.Signal.SignalWrangler;
 import frc.lib.Signal.Annotations.Signal;
@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
   CalWrangler cw;
 
   // Things
-  CasseroleRIOLoadMonitor loadMon;
+  RIOLoadMonitor loadMon;
   BatteryMonitor batMan;
 
   // Main Driver
@@ -103,7 +103,7 @@ public class Robot extends TimedRobot {
     cw = CalWrangler.getInstance();
     stt.mark("Cal Wrangler");
 
-    loadMon = new CasseroleRIOLoadMonitor();
+    loadMon = new RIOLoadMonitor();
     stt.mark("RIO Load Monitor");
 
     batMan = BatteryMonitor.getInstance();

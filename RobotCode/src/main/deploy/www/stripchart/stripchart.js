@@ -13,7 +13,7 @@ var plotsContainer = document.getElementById("plotsContainer");
 var plotList = [];
 var plotUniqueIdIdx = 0; //Used to ensure every newly added plot has a unique id
 
-var LOCAL_STORAGE_KEY_NAME = "CasseroleStripchartConfig";
+var LOCAL_STORAGE_KEY_NAME = "StripchartConfig";
 
 var local_storage_available = false;
 if (typeof(Storage) !== "undefined") {

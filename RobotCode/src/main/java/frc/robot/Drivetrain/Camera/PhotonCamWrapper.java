@@ -14,7 +14,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.Timer;
 import frc.lib.Signal.Annotations.Signal;
 
-public class CasserolePhotonCam {
+public class PhotonCamWrapper {
 
     PhotonCamera cam;
 
@@ -28,7 +28,7 @@ public class CasserolePhotonCam {
     final Transform3d robotToCam;
 
 
-    public CasserolePhotonCam(String cameraName, Transform3d robotToCam){
+    public PhotonCamWrapper(String cameraName, Transform3d robotToCam){
         this.cam = new PhotonCamera(cameraName);
         this.robotToCam = robotToCam;
         this.observations = new ArrayList<CameraPoseObservation>();

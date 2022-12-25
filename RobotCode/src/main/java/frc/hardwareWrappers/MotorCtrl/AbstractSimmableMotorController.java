@@ -1,4 +1,4 @@
-package frc.wrappers.MotorCtrl;
+package frc.hardwareWrappers.MotorCtrl;
 
 public abstract class AbstractSimmableMotorController {
 

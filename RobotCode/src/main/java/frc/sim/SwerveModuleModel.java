@@ -1,14 +1,14 @@
 package frc.sim;
 
 import frc.Constants;
+import frc.hardwareWrappers.SimDeviceBanks;
+import frc.hardwareWrappers.MotorCtrl.Sim.SimSmartMotor;
+import frc.hardwareWrappers.SwerveAzmthEncoder.Sim.SimSwerveAzmthEncoder;
 import frc.lib.Signal.Annotations.Signal;
 import frc.lib.Util.MapLookup2D;
 import frc.sim.physics.Force2d;
 import frc.sim.physics.ForceAtPose2d;
 import frc.sim.physics.Vector2d;
-import frc.wrappers.SimDeviceBanks;
-import frc.wrappers.MotorCtrl.Sim.SimSmartMotor;
-import frc.wrappers.SwerveAzmthEncoder.SimSwerveAzmthEncoder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;

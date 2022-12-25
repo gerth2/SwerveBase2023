@@ -1,12 +1,12 @@
-package frc.wrappers.MotorCtrl.Sim;
+package frc.hardwareWrappers.MotorCtrl.Sim;
 
 import java.util.ArrayList;
 
 import edu.wpi.first.math.util.Units;
 import frc.Constants;
+import frc.hardwareWrappers.SimDeviceBanks;
+import frc.hardwareWrappers.MotorCtrl.AbstractSimmableMotorController;
 import frc.lib.Signal.Annotations.Signal;
-import frc.wrappers.SimDeviceBanks;
-import frc.wrappers.MotorCtrl.AbstractSimmableMotorController;
 
 /**
  * CTRE doesn't currently support simulating the internal functionality of a TalonFX.

@@ -29,13 +29,20 @@ public class Constants {
     static public final double MAX_ROTATE_ACCEL_RAD_PER_SEC_2 = MAX_ROTATE_SPEED_RAD_PER_SEC/.25; //0-full time of 0.25 second
 
     // See https://www.swervedrivespecialties.com/products/mk4i-swerve-module?variant=39598777172081
-    static public final double WHEEL_GEAR_RATIO = 6.75;
+    static public final double WHEEL_GEAR_RATIO = 6.75; //L2 gearing
     static public final double AZMTH_GEAR_RATIO = 12.8;
     static public final double WHEEL_FUDGE_FACTOR = 0.9238; // carpet roughtop scrub factor
     static public final double WHEEL_RADIUS_IN = 4.0/2.0 * WHEEL_FUDGE_FACTOR; //four inch diameter wheels - https://www.swervedrivespecialties.com/collections/mk4i-parts/products/billet-wheel-4d-x-1-5w-bearing-bore
 
     // Mechanical mounting offsets of the encoder & magnet within the shaft
     // Must be updated whenever the module is reassembled
+    // Procedure: 
+    // 0 - Put the robot up on blocks.
+    // 1 - Reset all these values to 0, deploy code
+    // 2 - Pull up dashboard with encoder readings (in radians)
+    // 3 - Using a square, twist the modules by hand until they are aligned with the robot's chassis
+    // 4 - Read out the encoder readings for each module, put them here
+    // 5 - Redeploy code, verify that hte encoder readings are correct as each module is manually rotated
     static public final double FL_ENCODER_MOUNT_OFFSET_RAD = -2.157;
     static public final double FR_ENCODER_MOUNT_OFFSET_RAD = -1.575;
     static public final double BL_ENCODER_MOUNT_OFFSET_RAD = -2.180;
@@ -43,7 +50,7 @@ public class Constants {
 
     // Location of vision cameras relative to robot center - currently front and back
     static public final Transform3d robotToFrontCameraTrans = new Transform3d(new Translation3d(WHEEL_BASE_HALF_WIDTH_M, 0, 1.0), new Rotation3d(0.0,0.0,0.0));
-    static public final Transform3d robotToRearCameraTrans = new Transform3d(new Translation3d(-1.0*WHEEL_BASE_HALF_WIDTH_M, 0, 1.0), new Rotation3d(0.0,0.0,Math.PI));
+    static public final Transform3d robotToRearCameraTrans  = new Transform3d(new Translation3d(-1.0*WHEEL_BASE_HALF_WIDTH_M, 0, 1.0), new Rotation3d(0.0,0.0,Math.PI));
 
     //////////////////////////////////////////////////////////////////
     // Electrical

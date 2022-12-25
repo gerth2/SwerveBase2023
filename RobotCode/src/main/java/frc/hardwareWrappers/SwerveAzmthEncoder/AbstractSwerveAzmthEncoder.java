@@ -1,4 +1,4 @@
-package frc.wrappers.SwerveAzmthEncoder;
+package frc.hardwareWrappers.SwerveAzmthEncoder;
 
 
 public abstract class AbstractSwerveAzmthEncoder {

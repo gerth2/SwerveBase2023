@@ -36,7 +36,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
- * Interface into the Casserole autonomous sequencer for a path-planned traversal. Simply wraps
+ * Interface into the autonomous sequencer for a path-planned traversal. Simply wraps
  * path-planner functionality into the AutoEvent abstract class.
  */
 
