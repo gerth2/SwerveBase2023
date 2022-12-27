@@ -95,9 +95,9 @@ public class SignalWrangler {
             // fields in the associated class.
             for (Field field : rootClass.getDeclaredFields()) {
 
-                // As we recurse, keep track of the full-name for the object as a "."-separated
+                // As we recurse, keep track of the full-name for the object as a "/"-separated
                 // path of sorts.
-                String newName = prefix + (prefix.length() > 0 ? "." : "") + field.getName();
+                String newName = prefix + (prefix.length() > 0 ? "/" : "") + field.getName();
 
                 if (field.isAnnotationPresent(frc.lib.Signal.Annotations.Signal.class)) {
                     // Case #1 - we found a @signal annotation - create a new AUtoDiscoveredSignal

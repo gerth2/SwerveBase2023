@@ -131,7 +131,7 @@ export class SignalDAQNT4 {
     }
 
     isSignalValueTopic(topic){
-        return topic.match(/Signals\/[a-zA-Z0-9\._]+/);
+        return topic.name.match(/Signals\/[a-zA-Z0-9\._\/]+/);
     }
 
 
